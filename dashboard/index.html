@@ -332,6 +332,16 @@
         const msg = JSON.parse(event.data)
         console.log('WS received:', msg)
 
+        // Handle relay broadcast format: {type:"state", scores: {Ice: {ice, fire}, Fire: {ice, fire}}}
+        if (msg.type === 'state' && msg.scores) {
+          let totalIce = 0, totalFire = 0
+          Object.values(msg.scores).forEach(s => {
+            totalIce += (s.ice || 0)
+            totalFire += (s.fire || 0)
+          })
+          updateScores(totalIce, totalFire)
+        }
+
         // Handle relay broadcast format: {type:"state", players:[{name, ice, fire, total}]}
         if (msg.type === 'state' && msg.players) {
           let totalIce = 0, totalFire = 0
