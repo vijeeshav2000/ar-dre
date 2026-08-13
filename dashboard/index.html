@@ -3,916 +3,348 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Great War: Daenerys vs The Night King — Realm Battle Tracker</title>
+<title>Who Will Take the Iron Throne?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-dark: #06080d;
-    --card-bg: rgba(12, 16, 24, 0.88);
+    --bg: #06080d;
     --gold: #c5a059;
     --gold-light: #e5c178;
-    --ice-blue: #4fb3ff;
-    --ice-glow: rgba(79, 179, 255, 0.45);
-    --fire-red: #ff4520;
-    --fire-glow: rgba(255, 69, 32, 0.45);
-    --border-gold: rgba(197, 160, 89, 0.35);
-    --text-muted: #9aa5b5;
+    --ice: #4fb3ff;
+    --fire: #ff4520;
+    --ice-glow: rgba(79,179,255,0.4);
+    --fire-glow: rgba(255,69,32,0.4);
   }
 
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg-dark);
+    background: var(--bg);
     color: #e2e8f0;
     font-family: 'Cinzel', serif;
     min-height: 100vh;
-    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Atmospheric Background Effect */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background: 
-      radial-gradient(circle at 15% 20%, rgba(79, 179, 255, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 85% 20%, rgba(255, 69, 32, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 50% 85%, rgba(197, 160, 89, 0.06) 0%, transparent 60%);
+    background:
+      radial-gradient(circle at 20% 30%, rgba(79,179,255,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 30%, rgba(255,69,32,0.08) 0%, transparent 50%);
     pointer-events: none;
-    z-index: 0;
   }
 
-  body {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 36px 20px 100px;
+  .container {
     position: relative;
     z-index: 1;
-  }
-
-  /* Header Section */
-  header {
+    width: 100%;
+    max-width: 600px;
+    padding: 40px 24px;
     text-align: center;
-    margin-bottom: 38px;
-    position: relative;
   }
 
-  .crest-icon {
-    font-size: 36px;
-    letter-spacing: 14px;
-    margin-bottom: 8px;
-    display: block;
-    filter: drop-shadow(0 0 12px rgba(197, 160, 89, 0.6));
-  }
+  .sigil { font-size: 42px; letter-spacing: 12px; margin-bottom: 12px; }
 
   h1 {
     font-family: 'Cinzel Decorative', serif;
     font-weight: 900;
-    font-size: 2.4em;
-    letter-spacing: 4px;
-    margin: 0 0 8px;
-    background: linear-gradient(180deg, #ffffff 0%, #c5a059 70%, #8a6c32 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.8);
-    text-transform: uppercase;
+    font-size: clamp(1.4em, 5vw, 2.2em);
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 6px;
   }
 
   .subtitle {
-    font-family: 'Space Mono', monospace;
-    color: var(--gold-light);
-    font-size: 0.82em;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin: 0 0 20px;
-    opacity: 0.9;
-  }
-
-  /* Battle Overview Grid */
-  .battle-cards {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 36px;
-    align-items: stretch;
-  }
-
-  .faction-card {
-    flex: 1;
-    background: var(--card-bg);
-    border: 2px solid var(--border-gold);
-    border-radius: 18px;
-    padding: 26px 20px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .faction-card:hover {
-    transform: translateY(-4px);
-  }
-
-  .faction-card.nightking {
-    border-color: rgba(79, 179, 255, 0.6);
-    background: radial-gradient(circle at top left, rgba(79, 179, 255, 0.18) 0%, rgba(12, 16, 24, 0.95) 75%);
-  }
-
-  .faction-card.daenerys {
-    border-color: rgba(255, 69, 32, 0.6);
-    background: radial-gradient(circle at top right, rgba(255, 69, 32, 0.18) 0%, rgba(12, 16, 24, 0.95) 75%);
-  }
-
-  .faction-sigil {
-    font-size: 46px;
-    margin-bottom: 8px;
-    display: block;
-  }
-
-  .faction-title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 1.15em;
-    font-weight: 900;
-    letter-spacing: 2px;
-    margin: 0 0 4px;
-    text-transform: uppercase;
-  }
-
-  .nightking .faction-title { color: var(--ice-blue); text-shadow: 0 0 14px var(--ice-glow); }
-  .daenerys .faction-title { color: var(--fire-red); text-shadow: 0 0 14px var(--fire-glow); }
-
-  .faction-leader {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 0.9em;
-    color: #ffffff;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .faction-motto {
-    font-family: 'Cinzel', serif;
-    font-size: 0.72em;
-    letter-spacing: 1.5px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    font-style: italic;
-  }
-
-  .faction-score {
-    font-family: 'Space Mono', monospace;
-    font-size: 3.4em;
-    font-weight: 700;
-    line-height: 1;
-    margin: 12px 0 8px;
-    color: #ffffff;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-  }
-
-  .vs-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 54px;
-    height: 54px;
-    align-self: center;
-    border-radius: 50%;
-    border: 2px solid var(--gold);
-    background: #090c12;
-    color: var(--gold-light);
-    font-family: 'Cinzel Decorative', serif;
-    font-weight: 900;
-    font-size: 1.15em;
-    box-shadow: 0 0 18px rgba(197, 160, 89, 0.4);
-    flex-shrink: 0;
-  }
-
-  /* Panels Styling */
-  .panel {
-    background: var(--card-bg);
-    border: 1px solid var(--border-gold);
-    border-radius: 16px;
-    padding: 24px 26px;
-    margin-bottom: 28px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  }
-
-  .panel h2 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 1.05em;
-    color: var(--gold-light);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin: 0 0 18px;
-    border-bottom: 1px solid var(--border-gold);
-    padding-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  label {
-    display: block;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.78em;
-    margin-bottom: 6px;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.88em;
-    padding: 10px 14px;
-    border: 1px solid var(--border-gold);
-    border-radius: 8px;
-    background: rgba(5, 7, 12, 0.8);
-    color: #ffffff;
-    transition: border-color 0.2s ease;
-  }
-
-  input[type="text"]:focus {
-    outline: none;
-    border-color: var(--gold);
-    box-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
-  }
-
-  .row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .row > div {
-    flex: 1 1 220px;
-  }
-
-  button.action-btn {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 0.85em;
-    letter-spacing: 1.5px;
-    padding: 12px 24px;
-    border: 1px solid var(--gold);
-    border-radius: 8px;
-    background: linear-gradient(180deg, #c5a059 0%, #8a6c32 100%);
-    color: #000000;
-    cursor: pointer;
-    margin-top: 16px;
-    text-transform: uppercase;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
-  }
-
-  button.action-btn:hover {
-    background: linear-gradient(180deg, #e5c178 0%, #a68342 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(197, 160, 89, 0.5);
-  }
-
-  #status {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8em;
-    margin-top: 12px;
-    color: var(--text-muted);
-  }
-
-  #status.connected {
-    color: #4ade80;
-    text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
-  }
-
-  .chart-wrap {
-    overflow-x: auto;
-    margin-top: 10px;
-  }
-
-  svg text {
-    font-family: 'Space Mono', monospace;
-  }
-
-  .legend {
-    display: flex;
-    gap: 24px;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8em;
-    margin-top: 14px;
-    color: var(--text-muted);
-  }
-
-  .legend .swatch {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    margin-right: 8px;
-    vertical-align: -2px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.85em;
-  }
-
-  th, td {
-    border: 1px solid rgba(197, 160, 89, 0.2);
-    padding: 10px 14px;
-    text-align: left;
-  }
-
-  th {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    color: var(--gold-light);
-    text-transform: uppercase;
-    font-size: 0.82em;
-    letter-spacing: 1px;
-    background: rgba(197, 160, 89, 0.08);
-  }
-
-  tr:nth-child(even) td {
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  .empty {
-    color: var(--text-muted);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.85em;
-    text-align: center;
-    padding: 20px 0;
-  }
-
-  /* Fullscreen Universe Overlay */
-  #universe-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 999999;
-    background: #040508;
-    display: none;
-    overflow: hidden;
-  }
-
-  #universe-overlay.active {
-    display: block;
-  }
-
-  #universe-overlay pre {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    padding: 0;
-    font-family: 'Space Mono', monospace;
-    line-height: 1;
-    white-space: pre;
-    text-align: center;
-  }
-
-  #universe-overlay.ice pre { color: #4fb3ff; text-shadow: 0 0 10px #1a6fb0; }
-  #universe-overlay.fire pre { color: #ff4520; text-shadow: 0 0 10px #b02a10; }
-  #universe-overlay.tie pre { color: var(--gold); text-shadow: 0 0 10px #666666; }
-
-  #universe-overlay .caption {
-    position: absolute;
-    bottom: 50px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 1.4em;
+    font-size: 12px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--gold-light);
-    text-shadow: 0 0 15px rgba(197, 160, 89, 0.8);
+    color: #7a8494;
+    margin-bottom: 40px;
   }
 
-  #universe-overlay .close {
-    position: absolute;
-    top: 24px;
-    right: 28px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid var(--gold);
+  /* Score Panels */
+  .scores {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 36px;
+  }
+
+  .score-card {
+    flex: 1;
+    max-width: 200px;
+    padding: 28px 16px;
+    border-radius: 16px;
+    background: rgba(12,16,24,0.85);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(8px);
+    transition: box-shadow 0.4s;
+  }
+
+  .score-card.ice { box-shadow: 0 0 0 rgba(79,179,255,0); }
+  .score-card.fire { box-shadow: 0 0 0 rgba(255,69,32,0); }
+  .score-card.ice.active { box-shadow: 0 0 30px var(--ice-glow); border-color: rgba(79,179,255,0.3); }
+  .score-card.fire.active { box-shadow: 0 0 30px var(--fire-glow); border-color: rgba(255,69,32,0.3); }
+
+  .score-card .team-icon { font-size: 32px; margin-bottom: 8px; }
+  .score-card .team-name {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #7a8494;
+    margin-bottom: 4px;
+  }
+  .score-card .leader-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
+  .score-card.ice .leader-name { color: var(--ice); }
+  .score-card.fire .leader-name { color: var(--fire); }
+
+  .score-card .count {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .score-card.ice .count { color: var(--ice); }
+  .score-card.fire .count { color: var(--fire); }
+
+  .score-card .label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #5a6474;
+    margin-top: 6px;
+  }
+
+  /* Throne Button */
+  .throne-btn {
+    display: inline-block;
+    padding: 18px 36px;
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    background: rgba(197,160,89,0.08);
     color: var(--gold-light);
     font-family: 'Cinzel', serif;
-    padding: 8px 16px;
-    cursor: pointer;
-    border-radius: 6px;
-    letter-spacing: 1px;
+    font-size: clamp(13px, 3vw, 16px);
+    font-weight: 700;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 32px;
+  }
+  .throne-btn:hover {
+    background: rgba(197,160,89,0.18);
+    box-shadow: 0 0 30px rgba(197,160,89,0.2);
+  }
+  .throne-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
   }
 
-  @media (max-width: 640px) {
-    .battle-cards {
-      flex-direction: column;
-    }
-    .vs-badge {
-      align-self: center;
-      margin: -10px 0;
-    }
+  /* Result Reveal */
+  .result {
+    display: none;
+    padding: 32px 24px;
+    border-radius: 16px;
+    background: rgba(12,16,24,0.9);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    animation: revealFade 0.8s ease-out;
   }
+  .result.show { display: block; }
+
+  @keyframes revealFade {
+    from { opacity: 0; transform: translateY(16px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .result .crown { font-size: 56px; margin-bottom: 10px; }
+  .result .winner-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.2em, 4vw, 1.8em);
+    font-weight: 900;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .result.ice-wins .winner-title { color: var(--ice); }
+  .result.fire-wins .winner-title { color: var(--fire); }
+  .result.tie .winner-title { color: var(--gold); }
+
+  .result.ice-wins { border-color: rgba(79,179,255,0.25); box-shadow: 0 0 40px var(--ice-glow); }
+  .result.fire-wins { border-color: rgba(255,69,32,0.25); box-shadow: 0 0 40px var(--fire-glow); }
+  .result.tie { border-color: rgba(197,160,89,0.25); box-shadow: 0 0 40px rgba(197,160,89,0.2); }
+
+  .result .verdict {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #9aa5b5;
+    line-height: 1.6;
+  }
+
+  /* Connection Status */
+  .status {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a5464;
+    transition: color 0.3s;
+  }
+  .status.connected { color: #3d9970; }
 </style>
 </head>
 <body>
 
-<div id="universe-overlay">
-  <pre id="universe-ascii"></pre>
-  <div class="caption" id="universe-caption"></div>
-  <button class="close" id="universe-close">Dismiss Realm</button>
-</div>
-
-<header>
-  <span class="crest-icon">🐉 ⚔️ ❄️</span>
+<div class="container">
+  <div class="sigil">🐉⚔️🐉</div>
   <h1>The Great War</h1>
-  <p class="subtitle">DAENERYS (FIRE DRAGON DROGON) VS THE NIGHT KING (ICE DRAGON VISERION)</p>
-</header>
+  <div class="subtitle">Realm Battle Tracker</div>
 
-<div class="battle-cards">
-  <div class="faction-card nightking">
-    <span class="faction-sigil">❄️🐉</span>
-    <h3 class="faction-title">The White Walkers</h3>
-    <div class="faction-leader">Night King & Viserion</div>
-    <div class="faction-motto">Winter Has Come &middot; Ice Dragon Collectibles</div>
-    <div class="faction-score" id="hero-score-ice">00</div>
-  </div>
-
-  <div class="vs-badge">VS</div>
-
-  <div class="faction-card daenerys">
-    <span class="faction-sigil">🔥🐉</span>
-    <h3 class="faction-title">House Targaryen</h3>
-    <div class="faction-leader">Daenerys & Drogon</div>
-    <div class="faction-motto">Fire and Blood &middot; Fire Dragon Collectibles</div>
-    <div class="faction-score" id="hero-score-fire">00</div>
-  </div>
-</div>
-
-<div class="panel">
-  <h2><span>🏰</span> Realm Relay Connection</h2>
-  <div class="row">
-    <div>
-      <label for="relay-url">Relay URL (wss://...)</label>
-      <input type="text" id="relay-url" placeholder="wss://score-relay.iceandfire.workers.dev">
+  <div class="scores">
+    <div class="score-card ice" id="ice-card">
+      <div class="team-icon">❄️🐉</div>
+      <div class="team-name">The Night King</div>
+      <div class="leader-name">VISERION</div>
+      <div class="count" id="ice-count">0</div>
+      <div class="label">collected</div>
     </div>
-    <div>
-      <label for="room-code">Realm Code</label>
-      <input type="text" id="room-code" value="quantum1">
+    <div class="score-card fire" id="fire-card">
+      <div class="team-icon">🔥🐉</div>
+      <div class="team-name">Daenerys</div>
+      <div class="leader-name">DROGON</div>
+      <div class="count" id="fire-count">0</div>
+      <div class="label">collected</div>
     </div>
   </div>
-  <button class="action-btn" id="connect-btn">Connect to Great War Relay</button>
-  <div id="status">not connected</div>
-</div>
 
-<div class="panel">
-  <h2><span>⚔️</span> Dragon Battle Breakdown</h2>
-  <div class="chart-wrap">
-    <svg id="bar-chart" width="720" height="160"></svg>
-  </div>
-  <div class="legend">
-    <span><span class="swatch" id="swatch-ice"></span>Night King / Ice Dragon Viserion</span>
-    <span><span class="swatch" id="swatch-fire"></span>Daenerys / Fire Dragon Drogon</span>
+  <button class="throne-btn" id="throne-btn" disabled>
+    ⚔️ Who Will Take the Iron Throne? ⚔️
+  </button>
+
+  <div class="result" id="result">
+    <div class="crown" id="result-crown"></div>
+    <div class="winner-title" id="result-title"></div>
+    <div class="verdict" id="result-verdict"></div>
   </div>
 </div>
 
-<div class="panel">
-  <h2><span>📈</span> Battle Progress Over Time</h2>
-  <div class="chart-wrap">
-    <svg id="line-chart" width="720" height="220"></svg>
-  </div>
-  <div class="legend" id="line-legend"></div>
-</div>
-
-<div class="panel">
-  <h2><span>📜</span> Great War Log (Raw State)</h2>
-  <div id="table-wrap"><p class="empty">waiting for realm data&hellip;</p></div>
-</div>
+<div class="status" id="status">connecting to realm…</div>
 
 <script>
-(() => {
-  const relayInput = document.getElementById('relay-url')
-  const roomInput = document.getElementById('room-code')
-  const connectBtn = document.getElementById('connect-btn')
+(()=>{
+  const iceCountEl = document.getElementById('ice-count')
+  const fireCountEl = document.getElementById('fire-count')
+  const iceCard = document.getElementById('ice-card')
+  const fireCard = document.getElementById('fire-card')
+  const throneBtn = document.getElementById('throne-btn')
+  const resultEl = document.getElementById('result')
+  const resultCrown = document.getElementById('result-crown')
+  const resultTitle = document.getElementById('result-title')
+  const resultVerdict = document.getElementById('result-verdict')
   const statusEl = document.getElementById('status')
-  const heroIceEl = document.getElementById('hero-score-ice')
-  const heroFireEl = document.getElementById('hero-score-fire')
 
-  const params = new URLSearchParams(window.location.search)
+  let iceScore = 0
+  let fireScore = 0
 
-  const DEFAULT_RELAY_URL = 'wss://score-relay.iceandfire.workers.dev'
-
-  relayInput.value =
-    params.get('relay') ||
-    localStorage.getItem('dashboard-relay-url') ||
-    DEFAULT_RELAY_URL
-
-  roomInput.value =
-    params.get('room') ||
-    localStorage.getItem('dashboard-room') ||
-    'quantum1'
-
-  const svgNS = 'http://www.w3.org/2000/svg'
-
-  const ensurePatterns = (svg) => {
-    const defs = document.createElementNS(svgNS, 'defs')
-
-    const makePattern = (id, color1, color2, angle) => {
-      const pattern = document.createElementNS(svgNS, 'pattern')
-      pattern.setAttribute('id', id)
-      pattern.setAttribute('width', '8')
-      pattern.setAttribute('height', '8')
-      pattern.setAttribute('patternTransform', `rotate(${angle})`)
-      pattern.setAttribute('patternUnits', 'userSpaceOnUse')
-
-      const bg = document.createElementNS(svgNS, 'rect')
-      bg.setAttribute('width', '8')
-      bg.setAttribute('height', '8')
-      bg.setAttribute('fill', color1)
-      pattern.appendChild(bg)
-
-      const line = document.createElementNS(svgNS, 'line')
-      line.setAttribute('x1', '0')
-      line.setAttribute('y1', '0')
-      line.setAttribute('x2', '0')
-      line.setAttribute('y2', '8')
-      line.setAttribute('stroke', color2)
-      line.setAttribute('stroke-width', '3')
-      pattern.appendChild(line)
-
-      defs.appendChild(pattern)
+  const updateScores = (ice, fire) => {
+    if (ice > 0) {
+      iceScore = ice
+      iceCountEl.textContent = ice
+      iceCard.classList.add('active')
     }
-
-    makePattern('pattern-ice', '#0f2942', '#4fb3ff', 45)
-    makePattern('pattern-fire', '#3b120a', '#ff4520', -45)
-
-    svg.appendChild(defs)
-  }
-
-  const barSvg = document.getElementById('bar-chart')
-  ensurePatterns(barSvg)
-  document.getElementById('swatch-ice').style.background =
-    'repeating-linear-gradient(45deg, #0f2942 0, #0f2942 2px, #4fb3ff 2px, #4fb3ff 6px)'
-  document.getElementById('swatch-fire').style.background =
-    'repeating-linear-gradient(-45deg, #3b120a 0, #3b120a 2px, #ff4520 2px, #ff4520 6px)'
-
-  const el = (tag, attrs, parent) => {
-    const node = document.createElementNS(svgNS, tag)
-    Object.entries(attrs || {}).forEach(([k, v]) => node.setAttribute(k, v))
-    if (parent) parent.appendChild(node)
-    return node
-  }
-
-  // ----------------------------------------------
-  // BAR CHART: stacked per warrior
-  // ----------------------------------------------
-
-  const renderBarChart = (players) => {
-    while (barSvg.lastChild && barSvg.lastChild.tagName !== 'defs') {
-      barSvg.removeChild(barSvg.lastChild)
+    if (fire > 0) {
+      fireScore = fire
+      fireCountEl.textContent = fire
+      fireCard.classList.add('active')
     }
-
-    const width = 720
-    const rowHeight = 44
-    const height = Math.max(160, players.length * rowHeight + 20)
-    barSvg.setAttribute('height', height)
-    barSvg.setAttribute('viewBox', `0 0 ${width} ${height}`)
-
-    if (players.length === 0) {
-      el('text', {x: 10, y: 30, fill: '#9aa5b5', 'font-size': '13'}, barSvg).textContent = 'no realm warriors active in battle'
-      return
+    // Enable button when at least one team has scored
+    if (iceScore > 0 || fireScore > 0) {
+      throneBtn.disabled = false
     }
-
-    const maxTotal = Math.max(1, ...players.map(p => p.total))
-    const chartLeft = 140
-    const chartRight = width - 60
-    const chartWidth = chartRight - chartLeft
-    const barHeight = 22
-
-    players.forEach((p, i) => {
-      const y = 16 + i * rowHeight
-
-      el('text', {
-        x: chartLeft - 12,
-        y: y + barHeight / 2 + 4,
-        fill: '#e2e8f0',
-        'text-anchor': 'end',
-        'font-size': '13',
-      }, barSvg).textContent = p.name
-
-      const iceW = (p.ice / maxTotal) * chartWidth
-      const fireW = (p.fire / maxTotal) * chartWidth
-
-      el('rect', {
-        x: chartLeft, y, width: chartWidth, height: barHeight,
-        fill: 'rgba(255, 255, 255, 0.05)', stroke: 'rgba(197, 160, 89, 0.3)', 'stroke-width': 1, rx: 4
-      }, barSvg)
-
-      el('rect', {
-        x: chartLeft, y, width: iceW, height: barHeight,
-        fill: 'url(#pattern-ice)', stroke: '#4fb3ff', 'stroke-width': 1, rx: 4
-      }, barSvg)
-
-      el('rect', {
-        x: chartLeft + iceW, y, width: fireW, height: barHeight,
-        fill: 'url(#pattern-fire)', stroke: '#ff4520', 'stroke-width': 1, rx: 4
-      }, barSvg)
-
-      el('text', {
-        x: chartLeft + chartWidth + 12,
-        y: y + barHeight / 2 + 4,
-        fill: '#c5a059',
-        'font-size': '13',
-        'font-weight': 'bold'
-      }, barSvg).textContent = p.total
-    })
   }
 
-  // ----------------------------------------------
-  // LINE CHART: history per warrior
-  // ----------------------------------------------
+  throneBtn.addEventListener('click', () => {
+    resultEl.classList.remove('show', 'ice-wins', 'fire-wins', 'tie')
 
-  const history = new Map()
-  const strokeColors = ['#4fb3ff', '#ff4520', '#c5a059', '#a855f7']
-  const dashStyles = ['none', '6,4', '2,3', '10,3,2,3']
-
-  const lineSvg = document.getElementById('line-chart')
-  const lineLegend = document.getElementById('line-legend')
-
-  const renderLineChart = (players) => {
-    while (lineSvg.firstChild) lineSvg.removeChild(lineSvg.firstChild)
-    lineLegend.innerHTML = ''
-
-    const width = 720
-    const height = 220
-    lineSvg.setAttribute('viewBox', `0 0 ${width} ${height}`)
-
-    const padLeft = 40
-    const padRight = 20
-    const padTop = 16
-    const padBottom = 28
-    const plotW = width - padLeft - padRight
-    const plotH = height - padTop - padBottom
-
-    const allPoints = [...history.values()].flat()
-    if (allPoints.length === 0) {
-      el('text', {x: 10, y: 30, fill: '#9aa5b5', 'font-size': '13'}, lineSvg).textContent = 'awaiting battle history'
-      return
-    }
-
-    const minT = Math.min(...allPoints.map(p => p.t))
-    const maxT = Math.max(...allPoints.map(p => p.t), minT + 1)
-    const maxTotal = Math.max(1, ...allPoints.map(p => p.total))
-
-    // axes
-    el('line', {x1: padLeft, y1: padTop, x2: padLeft, y2: padTop + plotH, stroke: 'rgba(197, 160, 89, 0.4)'}, lineSvg)
-    el('line', {x1: padLeft, y1: padTop + plotH, x2: padLeft + plotW, y2: padTop + plotH, stroke: 'rgba(197, 160, 89, 0.4)'}, lineSvg)
-    el('text', {x: 4, y: padTop + 6, fill: '#9aa5b5', 'font-size': '11'}, lineSvg).textContent = maxTotal
-    el('text', {x: 4, y: padTop + plotH + 4, fill: '#9aa5b5', 'font-size': '11'}, lineSvg).textContent = '0'
-
-    const names = [...history.keys()]
-
-    names.forEach((name, i) => {
-      const points = history.get(name)
-      if (points.length === 0) return
-
-      const path = points.map((p, idx) => {
-        const x = padLeft + ((p.t - minT) / (maxT - minT || 1)) * plotW
-        const y = padTop + plotH - (p.total / maxTotal) * plotH
-        return `${idx === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
-      }).join(' ')
-
-      const stroke = strokeColors[i % strokeColors.length]
-
-      el('path', {
-        d: path,
-        fill: 'none',
-        stroke: stroke,
-        'stroke-width': 2.5,
-        'stroke-dasharray': dashStyles[i % dashStyles.length],
-      }, lineSvg)
-
-      const last = points[points.length - 1]
-      const lx = padLeft + ((last.t - minT) / (maxT - minT || 1)) * plotW
-      const ly = padTop + plotH - (last.total / maxTotal) * plotH
-      el('circle', {cx: lx, cy: ly, r: 4, fill: stroke}, lineSvg)
-      el('text', {
-        x: Math.min(lx + 6, width - 10), y: ly + 4, fill: '#e2e8f0', 'font-size': '12',
-      }, lineSvg).textContent = name
-
-      const legendItem = document.createElement('span')
-      legendItem.innerHTML =
-        `<svg width="20" height="10" style="vertical-align:-1px"><line x1="0" y1="5" x2="20" y2="5" ` +
-        `stroke="${stroke}" stroke-width="2.5" stroke-dasharray="${dashStyles[i % dashStyles.length]}"/></svg> ${name}`
-      lineLegend.appendChild(legendItem)
-    })
-  }
-
-  // ----------------------------------------------
-  // TABLE & HERO CARDS
-  // ----------------------------------------------
-
-  const renderTable = (players) => {
-    const wrap = document.getElementById('table-wrap')
-
-    let totalIce = 0
-    let totalFire = 0
-
-    players.forEach(p => {
-      totalIce += (p.ice || 0)
-      totalFire += (p.fire || 0)
-    })
-
-    heroIceEl.textContent = String(totalIce).padStart(2, '0')
-    heroFireEl.textContent = String(totalFire).padStart(2, '0')
-
-    if (players.length === 0) {
-      wrap.innerHTML = '<p class="empty">waiting for realm data&hellip;</p>'
-      return
-    }
-
-    const rows = players.map(p => `
-      <tr>
-        <td style="font-family:'Cinzel',serif;font-weight:700;color:#c5a059;">${p.name}</td>
-        <td style="color:#4fb3ff;">❄️ Viserion (Ice): ${p.ice}</td>
-        <td style="color:#ff4520;">🔥 Drogon (Fire): ${p.fire}</td>
-        <td style="font-weight:bold;color:#ffffff;">⚔️ ${p.total}</td>
-        <td style="color:#9aa5b5;">${new Date(p.updatedAt).toLocaleTimeString()}</td>
-      </tr>
-    `).join('')
-
-    wrap.innerHTML = `
-      <table>
-        <thead>
-          <tr><th>Warrior / Leader</th><th>Ice Dragon (Viserion)</th><th>Fire Dragon (Drogon)</th><th>Total Glory</th><th>Last Update</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `
-  }
-
-  // ----------------------------------------------
-  // UNIVERSE REVEAL (fullscreen ASCII animation)
-  // ----------------------------------------------
-
-  const universeOverlay = document.getElementById('universe-overlay')
-  const universeAscii = document.getElementById('universe-ascii')
-  const universeCaption = document.getElementById('universe-caption')
-  const universeClose = document.getElementById('universe-close')
-
-  const CHARS = ' .:-=+*#%@'
-  let universeAnimId = null
-
-  const sizeUniverseFont = (cols) => {
-    const fontSize = Math.max(4, window.innerWidth / (cols * 0.62))
-    universeAscii.style.fontSize = `${fontSize}px`
-  }
-
-  const startUniverse = (winner) => {
-    universeOverlay.classList.remove('ice', 'fire', 'tie')
-    universeOverlay.classList.add(winner)
-    universeOverlay.classList.add('active')
-
-    universeCaption.textContent =
-      winner === 'tie'
-        ? 'THE REALM IS IN BALANCED WAR &middot; FIRE AND ICE REIGN EQUAL'
-        : winner === 'ice'
-        ? 'THE NIGHT KING & VISERION AWAKEN &middot; WINTER SWEEPS THE REALM'
-        : 'DAENERYS & DROGON AWAKEN &middot; FIRE AND BLOOD REIGN SUPREME'
-
-    const cols = 110
-    const rows = 50
-    sizeUniverseFont(cols)
-
-    const cx = cols / 2
-    const cy = rows / 2
-    const maxR = Math.sqrt(cx * cx + cy * cy)
-    const startTime = performance.now()
-    const growDuration = 5000
-
-    const frame = (now) => {
-      const elapsed = now - startTime
-      const t = Math.min(1, elapsed / growDuration)
-      const radius = t * maxR * 1.2
-
-      let out = ''
-      for (let y = 0; y < rows; y++) {
-        let line = ''
-        for (let x = 0; x < cols; x++) {
-          const dx = x - cx
-          const dy = (y - cy) * 2.15
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          const edge = dist - radius
-
-          let ch = ' '
-
-          if (edge < 0) {
-            const noise =
-              Math.sin(dist * 0.5 + now * 0.0016) *
-              Math.cos(x * 0.28 - now * 0.001 + y * 0.22)
-            const intensity =
-              Math.max(0, Math.min(1, (1 - dist / maxR) + noise * 0.35))
-            ch = CHARS[Math.floor(intensity * (CHARS.length - 1))]
-          } else if (edge < 1.6) {
-            ch = Math.random() < 0.55 ? CHARS[CHARS.length - 1] : CHARS[CHARS.length - 2]
-          }
-
-          line += ch
-        }
-        out += line + '\n'
+    // Small delay for dramatic effect
+    setTimeout(() => {
+      if (iceScore > fireScore) {
+        resultEl.classList.add('show', 'ice-wins')
+        resultCrown.textContent = '❄️👑🐉'
+        resultTitle.textContent = 'THE NIGHT KING TAKES THE IRON THRONE'
+        resultVerdict.innerHTML = `Viserion's icy breath freezes the realm.<br>Ice ${iceScore} — Fire ${fireScore}`
+      } else if (fireScore > iceScore) {
+        resultEl.classList.add('show', 'fire-wins')
+        resultCrown.textContent = '🔥👑🐉'
+        resultTitle.textContent = 'DAENERYS TAKES THE IRON THRONE'
+        resultVerdict.innerHTML = `Drogon's fire melts the Iron Throne and forges a new world.<br>Fire ${fireScore} — Ice ${iceScore}`
+      } else {
+        resultEl.classList.add('show', 'tie')
+        resultCrown.textContent = '⚖️👑⚔️'
+        resultTitle.textContent = 'THE REALM IS DIVIDED'
+        resultVerdict.innerHTML = `Neither fire nor ice prevails. The war continues.<br>Ice ${iceScore} — Fire ${fireScore}`
       }
-
-      universeAscii.textContent = out
-      universeAnimId = requestAnimationFrame(frame)
-    }
-
-    universeAnimId = requestAnimationFrame(frame)
-  }
-
-  const stopUniverse = () => {
-    if (universeAnimId) cancelAnimationFrame(universeAnimId)
-    universeAnimId = null
-    universeOverlay.classList.remove('active')
-  }
-
-  universeClose.addEventListener('click', stopUniverse)
-  window.addEventListener('resize', () => {
-    if (universeOverlay.classList.contains('active')) sizeUniverseFont(110)
+    }, 300)
   })
 
-  // ----------------------------------------------
-  // WEBSOCKET RELAY
-  // ----------------------------------------------
+  // WebSocket auto-connect
+  const params = new URLSearchParams(window.location.search)
+  const relay = params.get('relay') || 'wss://score-relay.iceandfire.workers.dev'
+  const room = params.get('room') || 'quantum1'
 
   let socket = null
 
-  const setStatus = (text, connected) => {
-    statusEl.textContent = text
-    statusEl.className = connected ? 'connected' : ''
-  }
-
-  const handleState = (msg) => {
-    const players = msg.players || []
-    const now = Date.now()
-
-    players.forEach((p) => {
-      if (!history.has(p.name)) history.set(p.name, [])
-      const arr = history.get(p.name)
-      arr.push({t: now, total: p.total})
-      if (arr.length > 200) arr.shift()
-    })
-
-    renderBarChart(players)
-    renderLineChart(players)
-    renderTable(players)
-  }
-
   const connect = () => {
-    const relayUrl = relayInput.value.trim()
-    const room = roomInput.value.trim() || 'quantum1'
-
-    if (!relayUrl) {
-      setStatus('enter a relay URL first', false)
-      return
-    }
-
-    localStorage.setItem('dashboard-relay-url', relayUrl)
-    localStorage.setItem('dashboard-room', room)
-
-    if (socket) socket.close()
-
-    setStatus('connecting to great war relay…', false)
-
-    const url =
-      `${relayUrl.replace(/\/$/, '')}/ws?room=${encodeURIComponent(room)}` +
-      `&name=dashboard&role=viewer`
-
+    const url = `${relay}/ws?room=${encodeURIComponent(room)}&name=dashboard&role=viewer`
     socket = new WebSocket(url)
 
-    socket.addEventListener('open', () => setStatus(`connected to great war relay &middot; room "${room}"`, true))
-    socket.addEventListener('close', () => setStatus('disconnected from realm', false))
-    socket.addEventListener('error', () => setStatus('realm connection error', false))
+    socket.addEventListener('open', () => {
+      statusEl.textContent = `connected · room "${room}"`
+      statusEl.className = 'status connected'
+    })
+
+    socket.addEventListener('close', () => {
+      statusEl.textContent = 'disconnected · reconnecting…'
+      statusEl.className = 'status'
+      setTimeout(connect, 2000)
+    })
+
+    socket.addEventListener('error', () => {
+      socket.close()
+    })
 
     socket.addEventListener('message', (event) => {
       try {
         const msg = JSON.parse(event.data)
-        if (msg.type === 'state') handleState(msg)
-        if (msg.type === 'universe') startUniverse(msg.winner)
-      } catch (e) {
+        if (msg.type === 'state' && msg.players) {
+          let totalIce = 0, totalFire = 0
+          msg.players.forEach(p => {
+            totalIce += (p.ice || 0)
+            totalFire += (p.fire || 0)
+          })
+          updateScores(totalIce, totalFire)
+        }
+      } catch(e) {
         console.error('bad message', e)
       }
     })
   }
 
-  connectBtn.addEventListener('click', connect)
-  if (relayInput.value) connect()
+  connect()
 })()
 </script>
 
