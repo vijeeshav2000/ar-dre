@@ -330,6 +330,9 @@
     socket.addEventListener('message', (event) => {
       try {
         const msg = JSON.parse(event.data)
+        console.log('WS received:', msg)
+
+        // Handle relay broadcast format: {type:"state", players:[{name, ice, fire, total}]}
         if (msg.type === 'state' && msg.players) {
           let totalIce = 0, totalFire = 0
           msg.players.forEach(p => {
@@ -337,6 +340,16 @@
             totalFire += (p.fire || 0)
           })
           updateScores(totalIce, totalFire)
+        }
+
+        // Handle direct player score: {type:"score", name:"Ice"/"Fire", ice:N, fire:N}
+        if (msg.type === 'score') {
+          updateScores(msg.ice || 0, msg.fire || 0)
+        }
+
+        // Handle any message with ice/fire fields (catch-all)
+        if (typeof msg.ice === 'number' || typeof msg.fire === 'number') {
+          updateScores(msg.ice || 0, msg.fire || 0)
         }
       } catch(e) {
         console.error('bad message', e)
