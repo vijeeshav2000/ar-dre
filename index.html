@@ -3,41 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QUANTUM1</title>
+<title>The Great War: A Song of Ice and Fire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #ffffff; --ink: #000000; --muted: #555555; --border: #000000; }
+  :root {
+    --bg-dark: #06080d;
+    --card-bg: rgba(12, 16, 24, 0.88);
+    --gold: #c5a059;
+    --gold-light: #e5c178;
+    --ice-blue: #4fb3ff;
+    --ice-glow: rgba(79, 179, 255, 0.35);
+    --fire-red: #ff4520;
+    --fire-glow: rgba(255, 69, 32, 0.35);
+    --border-gold: rgba(197, 160, 89, 0.35);
+    --text-muted: #9aa5b5;
+  }
+
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; }
-  body { max-width: 700px; margin: 0 auto; padding: 60px 20px; }
-  h1 { font-size: 1.6em; margin: 0 0 4px; }
-  .subtitle { color: var(--muted); font-family: 'Courier New', monospace; font-size: 0.85em; margin: 0 0 32px; }
-  ul { list-style: none; padding: 0; margin: 0; }
-  li { border: 1px solid var(--border); margin-bottom: 12px; }
-  a { display: block; padding: 16px 18px; color: var(--ink); text-decoration: none; }
-  a:hover { background: var(--ink); color: var(--bg); }
-  .label { font-family: 'Courier New', monospace; font-size: 0.8em; color: var(--muted); display: block; margin-bottom: 4px; }
-  a:hover .label { color: #cccccc; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-dark);
+    color: #e2e8f0;
+    font-family: 'Cinzel', serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  /* Atmospheric Ambient Glow Background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(circle at 20% 25%, rgba(79, 179, 255, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 25%, rgba(255, 69, 32, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, rgba(197, 160, 89, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 680px;
+    padding: 40px 24px;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  /* Header Section */
+  header {
+    margin-bottom: 40px;
+  }
+
+  .crest-icon {
+    font-size: 40px;
+    letter-spacing: 16px;
+    margin-bottom: 10px;
+    display: block;
+    filter: drop-shadow(0 0 12px rgba(197, 160, 89, 0.6));
+  }
+
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 900;
+    font-size: 2.5em;
+    letter-spacing: 4px;
+    margin: 0 0 10px;
+    background: linear-gradient(180deg, #ffffff 0%, #c5a059 70%, #8a6c32 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    text-transform: uppercase;
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    color: var(--gold-light);
+    font-size: 0.82em;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  /* Selection Cards */
+  .portal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .portal-card {
+    display: block;
+    background: var(--card-bg);
+    border: 2px solid var(--border-gold);
+    border-radius: 18px;
+    padding: 28px 24px;
+    text-decoration: none;
+    color: #ffffff;
+    text-align: left;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .portal-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--gold);
+    box-shadow: 0 16px 40px rgba(197, 160, 89, 0.25);
+  }
+
+  .portal-card.ar-card {
+    border-color: rgba(255, 69, 32, 0.4);
+    background: radial-gradient(circle at top right, rgba(255, 69, 32, 0.12) 0%, rgba(12, 16, 24, 0.92) 70%);
+  }
+
+  .portal-card.ar-card:hover {
+    border-color: rgba(255, 69, 32, 0.8);
+    box-shadow: 0 16px 40px rgba(255, 69, 32, 0.3);
+  }
+
+  .portal-card.dashboard-card {
+    border-color: rgba(79, 179, 255, 0.4);
+    background: radial-gradient(circle at top left, rgba(79, 179, 255, 0.12) 0%, rgba(12, 16, 24, 0.92) 70%);
+  }
+
+  .portal-card.dashboard-card:hover {
+    border-color: rgba(79, 179, 255, 0.8);
+    box-shadow: 0 16px 40px rgba(79, 179, 255, 0.3);
+  }
+
+  .portal-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75em;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .portal-card.ar-card .portal-tag { color: var(--fire-red); }
+  .portal-card.dashboard-card .portal-tag { color: var(--ice-blue); }
+
+  .portal-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.4em;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: 2px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .portal-desc {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85em;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .arrow-btn {
+    font-size: 1.2em;
+    transition: transform 0.2s ease;
+  }
+
+  .portal-card:hover .arrow-btn {
+    transform: translateX(6px);
+  }
+
+  footer {
+    margin-top: 40px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75em;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
 </style>
 </head>
 <body>
 
-<h1>QUANTUM1</h1>
-<p class="subtitle">ice &amp; fire collectible AR experience</p>
+<div class="container">
+  <header>
+    <span class="crest-icon">🐉 ⚔️ ❄️</span>
+    <h1>The Great War</h1>
+    <p class="subtitle">A SONG OF ICE AND FIRE &middot; QUANTUM1 AR EXPERIENCE</p>
+  </header>
 
-<ul>
-  <li>
-    <a href="./ar/">
-      <span class="label">phones &middot; play</span>
-      AR Experience &rarr;
+  <div class="portal-list">
+    <a href="./ar/" class="portal-card ar-card">
+      <div class="portal-tag">
+        <span>MOBILE PHONE &middot; CAMERA EXPERIENCE</span>
+        <span class="arrow-btn">&rarr;</span>
+      </div>
+      <h2 class="portal-title"><span>⚔️</span> Enter AR Battlefield</h2>
+      <p class="portal-desc">
+        Launch camera AR on your phone, choose your dragon allegiance (Daenerys & Drogon vs The Night King & Viserion), and collect 3D dragon items in your room!
+      </p>
     </a>
-  </li>
-  <li>
-    <a href="./dashboard/">
-      <span class="label">PC &middot; watch</span>
-      Live Score Dashboard &rarr;
+
+    <a href="./dashboard/" class="portal-card dashboard-card">
+      <div class="portal-tag">
+        <span>PC / TABLET &middot; REALM DISPLAY</span>
+        <span class="arrow-btn">&rarr;</span>
+      </div>
+      <h2 class="portal-title"><span>🏰</span> Launch Realm Dashboard</h2>
+      <p class="portal-desc">
+        Watch live faction scores, dragon battle progress over time, and real-time player updates on a big screen!
+      </p>
     </a>
-  </li>
-</ul>
+  </div>
+
+  <footer>
+    QUANTUM1 REAL-TIME AR GAME RELAY
+  </footer>
+</div>
 
 </body>
 </html>
