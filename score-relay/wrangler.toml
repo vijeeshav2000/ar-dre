@@ -1,0 +1,12 @@
+name = "score-relay"
+main = "src/worker.ts"
+compatibility_date = "2024-09-23"
+
+[durable_objects]
+bindings = [
+  { name = "SCORE_ROOM", class_name = "ScoreRoom" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ScoreRoom"]

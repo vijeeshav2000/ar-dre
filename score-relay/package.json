@@ -1,0 +1,14 @@
+{
+  "name": "score-relay",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "npx wrangler deploy",
+    "dev": "npx wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240101.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.22.0"
+  }
+}
