@@ -130,11 +130,12 @@
 
   /* SLIDE 1: Yin Yang Emblem */
   .yin-yang-emblem {
-    width: min(340px, 48vw);
-    height: min(340px, 48vw);
+    width: min(360px, 50vw);
+    height: min(360px, 50vw);
     margin: 10px auto 36px;
     object-fit: contain;
-    filter: drop-shadow(0 0 35px rgba(79, 179, 255, 0.4)) drop-shadow(0 0 35px rgba(255, 69, 32, 0.4));
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 35px rgba(79, 179, 255, 0.6)) drop-shadow(0 0 35px rgba(255, 69, 32, 0.6));
     animation: rotateSubtle 35s linear infinite;
   }
   @keyframes rotateSubtle {
@@ -207,15 +208,16 @@
   }
 
   .flame-graphic {
-    width: clamp(120px, 18vw, 180px);
-    height: clamp(180px, 28vw, 270px);
+    width: clamp(130px, 20vw, 200px);
+    height: clamp(200px, 30vw, 300px);
     object-fit: contain;
     margin-bottom: 16px;
-    filter: drop-shadow(0 0 30px rgba(255, 69, 32, 0.7));
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 35px rgba(255, 69, 32, 0.8));
     animation: floatAnim 4s ease-in-out infinite alternate;
   }
   .flame-graphic.ice {
-    filter: drop-shadow(0 0 30px rgba(79, 179, 255, 0.7));
+    filter: drop-shadow(0 0 35px rgba(79, 179, 255, 0.8));
     animation-delay: -2s;
   }
   @keyframes floatAnim {
@@ -241,21 +243,23 @@
   /* SLIDE 5: QR Scanner & Ambient Side Flames */
   .ambient-flame-left {
     position: absolute;
-    left: 0;
+    left: -20px;
     bottom: 0;
-    height: 80vh;
+    height: 85vh;
     object-fit: contain;
     pointer-events: none;
-    opacity: 0.8;
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 30px rgba(255, 69, 32, 0.6));
   }
   .ambient-flame-right {
     position: absolute;
-    right: 0;
+    right: -20px;
     bottom: 0;
-    height: 80vh;
+    height: 85vh;
     object-fit: contain;
     pointer-events: none;
-    opacity: 0.8;
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 30px rgba(79, 179, 255, 0.6));
   }
 
   .qr-frame {
