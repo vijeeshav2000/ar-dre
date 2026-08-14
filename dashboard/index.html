@@ -261,44 +261,64 @@
   let fireScore = 0
 
   const updateScores = (ice, fire) => {
+    iceScore = ice
+    iceCountEl.textContent = ice
     if (ice > 0) {
-      iceScore = ice
-      iceCountEl.textContent = ice
       iceCard.classList.add('active')
+    } else {
+      iceCard.classList.remove('active')
     }
+
+    fireScore = fire
+    fireCountEl.textContent = fire
     if (fire > 0) {
-      fireScore = fire
-      fireCountEl.textContent = fire
       fireCard.classList.add('active')
+    } else {
+      fireCard.classList.remove('active')
     }
+
     // Enable button when at least one team has scored
-    if (iceScore > 0 || fireScore > 0) {
-      throneBtn.disabled = false
-    }
+    throneBtn.disabled = !(iceScore > 0 || fireScore > 0)
   }
 
   throneBtn.addEventListener('click', () => {
+    const finalIce = iceScore
+    const finalFire = fireScore
+
     resultEl.classList.remove('show', 'ice-wins', 'fire-wins', 'tie')
 
-    // Small delay for dramatic effect
-    setTimeout(() => {
-      if (iceScore > fireScore) {
-        resultEl.classList.add('show', 'ice-wins')
-        resultCrown.textContent = '❄️👑🐉'
-        resultTitle.textContent = 'THE NIGHT KING TAKES THE IRON THRONE'
-        resultVerdict.innerHTML = `Viserion's icy breath freezes the realm.<br>Ice ${iceScore} — Fire ${fireScore}`
-      } else if (fireScore > iceScore) {
-        resultEl.classList.add('show', 'fire-wins')
-        resultCrown.textContent = '🔥👑🐉'
-        resultTitle.textContent = 'DAENERYS TAKES THE IRON THRONE'
-        resultVerdict.innerHTML = `Drogon's fire melts the Iron Throne and forges a new world.<br>Fire ${fireScore} — Ice ${iceScore}`
-      } else {
-        resultEl.classList.add('show', 'tie')
-        resultCrown.textContent = '⚖️👑⚔️'
-        resultTitle.textContent = 'THE REALM IS DIVIDED'
-        resultVerdict.innerHTML = `Neither fire nor ice prevails. The war continues.<br>Ice ${iceScore} — Fire ${fireScore}`
+    // Reveal winner based on final scores
+    if (finalIce > finalFire) {
+      resultEl.classList.add('show', 'ice-wins')
+      resultCrown.textContent = '❄️👑🐉'
+      resultTitle.textContent = 'THE NIGHT KING TAKES THE IRON THRONE'
+      resultVerdict.innerHTML = `Viserion's icy breath freezes the realm.<br>Ice ${finalIce} — Fire ${finalFire}`
+    } else if (finalFire > finalIce) {
+      resultEl.classList.add('show', 'fire-wins')
+      resultCrown.textContent = '🔥👑🐉'
+      resultTitle.textContent = 'DAENERYS TAKES THE IRON THRONE'
+      resultVerdict.innerHTML = `Drogon's fire melts the Iron Throne and forges a new world.<br>Fire ${finalFire} — Ice ${finalIce}`
+    } else {
+      resultEl.classList.add('show', 'tie')
+      resultCrown.textContent = '⚖️👑⚔️'
+      resultTitle.textContent = 'THE REALM IS DIVIDED'
+      resultVerdict.innerHTML = `Neither fire nor ice prevails. The war continues.<br>Ice ${finalIce} — Fire ${finalFire}`
+    }
+
+    // Reset counters to zero immediately
+    updateScores(0, 0)
+
+    // Notify relay server to reset all stored scores to zero for the next battle
+    try {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'reset' }))
       }
-    }, 300)
+      fetch(`${httpRelay}/reset?room=${encodeURIComponent(room)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors'
+      }).catch(() => {})
+    } catch(e) {}
   })
 
   // WebSocket auto-connect
