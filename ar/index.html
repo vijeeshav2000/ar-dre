@@ -7,6 +7,13 @@
   <script crossorigin="anonymous" src="./external/runtime/runtime.js"></script>
   <script crossorigin="anonymous" data-preload-chunks="slam" src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"></script>
   <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/@8thwall/landing-page@1/dist/landing-page.js"></script>
+  <style>
+    .poweredby-8thwall, #poweredby-img, [id*="poweredby"], [class*="poweredby"], [id*="eightw-"], [class*="eightw-"], [class*="landing-page"] {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  </style>
 </head>
 <body>
   <script src="bundle.js"></script>
