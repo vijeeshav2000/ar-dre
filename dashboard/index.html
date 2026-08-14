@@ -151,7 +151,36 @@
     transform: translateY(-3px);
   }
 
-  .score-card .team-icon { font-size: 34px; margin-bottom: 8px; }
+  .score-card .team-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90px;
+    margin-bottom: 8px;
+  }
+  .score-card .dash-flame {
+    width: 65px;
+    height: 90px;
+    object-fit: contain;
+    mix-blend-mode: screen;
+    transition: transform 0.3s ease;
+  }
+  .score-card.fire .dash-flame {
+    filter: drop-shadow(0 0 16px rgba(255, 69, 32, 0.8));
+    animation: flameFloatFire 3.5s ease-in-out infinite alternate;
+  }
+  .score-card.ice .dash-flame {
+    filter: drop-shadow(0 0 16px rgba(79, 179, 255, 0.8));
+    animation: flameFloatIce 3.5s ease-in-out infinite alternate;
+  }
+  @keyframes flameFloatFire {
+    from { transform: translateY(0); }
+    to { transform: translateY(-6px) scale(1.04); }
+  }
+  @keyframes flameFloatIce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-6px) scale(1.04); }
+  }
   .score-card .team-name {
     font-size: 10px;
     letter-spacing: 2px;
@@ -321,14 +350,18 @@
 
   <div class="scores">
     <div class="score-card fire" id="fire-card">
-      <div class="team-icon">🔥</div>
+      <div class="team-icon">
+        <img src="assets/fire_flame.png" alt="Matter / Fire" class="dash-flame">
+      </div>
       <div class="team-name">PLAYER 1 &middot; MATTER</div>
       <div class="leader-name">DAENERYS (FIRE)</div>
       <div class="count" id="fire-count">0</div>
       <div class="label">collected</div>
     </div>
     <div class="score-card ice" id="ice-card">
-      <div class="team-icon">❄️</div>
+      <div class="team-icon">
+        <img src="assets/ice_flame.png" alt="Antimatter / Ice" class="dash-flame">
+      </div>
       <div class="team-name">PLAYER 2 &middot; ANTIMATTER</div>
       <div class="leader-name">NIGHT KING (ICE)</div>
       <div class="count" id="ice-count">0</div>
@@ -532,17 +565,17 @@
 
       if (winnerType === 'ice') {
         resultEl.classList.add('show', 'ice-wins')
-        resultCrown.textContent = '❄️👑🐉'
+        resultCrown.innerHTML = '<img src="assets/ice_flame.png" style="width:75px;height:105px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 25px rgba(79,179,255,0.9));">'
         resultTitle.textContent = 'THE NIGHT KING TAKES THE IRON THRONE'
         resultVerdict.innerHTML = `Viserion's icy blizzard freezes the realm.<br>Ice ${finalIce} — Fire ${finalFire}`
       } else if (winnerType === 'fire') {
         resultEl.classList.add('show', 'fire-wins')
-        resultCrown.textContent = '🔥👑🐉'
+        resultCrown.innerHTML = '<img src="assets/fire_flame.png" style="width:75px;height:105px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 25px rgba(255,69,32,0.9));">'
         resultTitle.textContent = 'DAENERYS TAKES THE IRON THRONE'
         resultVerdict.innerHTML = `Drogon's inferno melts the Iron Throne and creates a new dynasty.<br>Fire ${finalFire} — Ice ${finalIce}`
       } else {
         resultEl.classList.add('show', 'tie')
-        resultCrown.textContent = '⚔️⚖️🛡️'
+        resultCrown.innerHTML = '<img src="assets/yinyang.png" style="width:85px;height:85px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 25px rgba(215,185,126,0.9));">'
         resultTitle.textContent = 'NO ONE TAKES THE IRON THRONE'
         resultVerdict.innerHTML = `Fire and Ice have clashed to an exact standstill.<br>Ice ${finalIce} — Fire ${finalFire}<br><span style="color:var(--gold);font-weight:700;letter-spacing:1.5px;display:inline-block;margin-top:6px">THE IRON THRONE STANDS EMPTY</span>`
       }
