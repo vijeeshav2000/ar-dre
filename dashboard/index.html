@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Who Will Take the Iron Throne?</title>
+<title>Who Will Take the Iron Throne? — Live Battle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #06080d;
@@ -14,8 +14,8 @@
     --gold-light: #e5c178;
     --ice: #4fb3ff;
     --fire: #ff4520;
-    --ice-glow: rgba(79,179,255,0.4);
-    --fire-glow: rgba(255,69,32,0.4);
+    --ice-glow: rgba(79,179,255,0.5);
+    --fire-glow: rgba(255,69,32,0.5);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,8 +28,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow-x: hidden;
   }
 
+  /* Fullscreen particle FX canvas */
+  #fx-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 99;
+  }
+
+  /* Atmospheric Background Effect */
   body::before {
     content: '';
     position: fixed;
@@ -38,63 +51,110 @@
       radial-gradient(circle at 20% 30%, rgba(79,179,255,0.08) 0%, transparent 50%),
       radial-gradient(circle at 80% 30%, rgba(255,69,32,0.08) 0%, transparent 50%);
     pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Screen shake animation */
+  .screen-shake {
+    animation: shakeAnim 0.8s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes shakeAnim {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: translate(-6px, 4px) rotate(-0.5deg); }
+    20%, 40%, 60%, 80% { transform: translate(6px, -4px) rotate(0.5deg); }
+  }
+
+  /* Blinding flash overlay */
+  #flash-overlay {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    transition: opacity 0.1s ease-out;
+  }
+  #flash-overlay.flash {
+    opacity: 0.85;
+    transition: opacity 0.8s ease-out;
+  }
+  #flash-overlay.flash-ice {
+    background: radial-gradient(circle, #c8e8ff 0%, #4fb3ff 60%, transparent 100%);
+  }
+  #flash-overlay.flash-fire {
+    background: radial-gradient(circle, #ffeedd 0%, #ff4520 60%, transparent 100%);
   }
 
   .container {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 600px;
-    padding: 40px 24px;
+    max-width: 620px;
+    padding: 36px 20px;
     text-align: center;
   }
 
-  .sigil { font-size: 42px; letter-spacing: 12px; margin-bottom: 12px; }
+  .sigil {
+    font-size: 42px;
+    letter-spacing: 12px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 16px rgba(197,160,89,0.4));
+  }
 
   h1 {
     font-family: 'Cinzel Decorative', serif;
     font-weight: 900;
-    font-size: clamp(1.4em, 5vw, 2.2em);
+    font-size: clamp(1.5em, 5.5vw, 2.3em);
     letter-spacing: 3px;
     color: var(--gold);
     margin-bottom: 6px;
+    text-shadow: 0 0 20px rgba(197,160,89,0.3);
   }
 
   .subtitle {
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: #7a8494;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
   }
 
   /* Score Panels */
   .scores {
     display: flex;
-    gap: 20px;
+    gap: 18px;
     justify-content: center;
-    margin-bottom: 36px;
+    margin-bottom: 32px;
   }
 
   .score-card {
     flex: 1;
-    max-width: 200px;
-    padding: 28px 16px;
-    border-radius: 16px;
+    max-width: 210px;
+    padding: 26px 14px;
+    border-radius: 18px;
     background: rgba(12,16,24,0.85);
     border: 1px solid rgba(255,255,255,0.06);
     backdrop-filter: blur(8px);
-    transition: box-shadow 0.4s;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
   }
 
-  .score-card.ice { box-shadow: 0 0 0 rgba(79,179,255,0); }
-  .score-card.fire { box-shadow: 0 0 0 rgba(255,69,32,0); }
-  .score-card.ice.active { box-shadow: 0 0 30px var(--ice-glow); border-color: rgba(79,179,255,0.3); }
-  .score-card.fire.active { box-shadow: 0 0 30px var(--fire-glow); border-color: rgba(255,69,32,0.3); }
+  .score-card.ice.active {
+    box-shadow: 0 0 35px var(--ice-glow);
+    border-color: rgba(79,179,255,0.5);
+    transform: translateY(-3px);
+  }
+  .score-card.fire.active {
+    box-shadow: 0 0 35px var(--fire-glow);
+    border-color: rgba(255,69,32,0.5);
+    transform: translateY(-3px);
+  }
 
-  .score-card .team-icon { font-size: 32px; margin-bottom: 8px; }
+  .score-card .team-icon { font-size: 34px; margin-bottom: 8px; }
   .score-card .team-name {
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: #7a8494;
@@ -104,19 +164,20 @@
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 1.5px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
   }
   .score-card.ice .leader-name { color: var(--ice); }
   .score-card.fire .leader-name { color: var(--fire); }
 
   .score-card .count {
     font-family: 'Cinzel Decorative', serif;
-    font-size: 48px;
+    font-size: 52px;
     font-weight: 900;
     line-height: 1;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .score-card.ice .count { color: var(--ice); }
-  .score-card.fire .count { color: var(--fire); }
+  .score-card.ice .count { color: var(--ice); text-shadow: 0 0 20px var(--ice-glow); }
+  .score-card.fire .count { color: var(--fire); text-shadow: 0 0 20px var(--fire-glow); }
 
   .score-card .label {
     font-size: 10px;
@@ -131,71 +192,128 @@
     display: inline-block;
     padding: 18px 36px;
     border: 2px solid var(--gold);
-    border-radius: 12px;
+    border-radius: 14px;
     background: rgba(197,160,89,0.08);
     color: var(--gold-light);
     font-family: 'Cinzel', serif;
-    font-size: clamp(13px, 3vw, 16px);
+    font-size: clamp(13px, 3vw, 15px);
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
   }
-  .throne-btn:hover {
-    background: rgba(197,160,89,0.18);
-    box-shadow: 0 0 30px rgba(197,160,89,0.2);
+  .throne-btn:hover:not(:disabled) {
+    background: rgba(197,160,89,0.22);
+    box-shadow: 0 0 35px rgba(197,160,89,0.4);
+    transform: scale(1.02);
+  }
+  .throne-btn:active:not(:disabled) {
+    transform: scale(0.97);
   }
   .throne-btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
+    border-color: rgba(197,160,89,0.2);
+  }
+  .throne-btn.pulsing {
+    animation: btnPulse 0.5s infinite alternate;
+  }
+  @keyframes btnPulse {
+    from { box-shadow: 0 0 15px rgba(197,160,89,0.3); }
+    to { box-shadow: 0 0 40px rgba(197,160,89,0.8); }
   }
 
   /* Result Reveal */
   .result {
     display: none;
-    padding: 32px 24px;
-    border-radius: 16px;
-    background: rgba(12,16,24,0.9);
-    border: 1px solid rgba(255,255,255,0.06);
-    backdrop-filter: blur(12px);
-    animation: revealFade 0.8s ease-out;
+    padding: 36px 22px;
+    border-radius: 18px;
+    background: rgba(10,14,22,0.92);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(14px);
+    position: relative;
   }
-  .result.show { display: block; }
-
-  @keyframes revealFade {
-    from { opacity: 0; transform: translateY(16px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+  .result.show {
+    display: block;
+    animation: revealDramatic 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  .result .crown { font-size: 56px; margin-bottom: 10px; }
+  @keyframes revealDramatic {
+    0% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.85);
+      filter: blur(10px);
+    }
+    50% {
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0px);
+    }
+  }
+
+  .result .crown {
+    font-size: 60px;
+    margin-bottom: 12px;
+    display: inline-block;
+    animation: crownPop 0.8s cubic-bezier(0.16, 1, 0.3, 1) both 0.2s;
+  }
+
+  @keyframes crownPop {
+    0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
+    70% { transform: scale(1.25) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
   .result .winner-title {
     font-family: 'Cinzel Decorative', serif;
     font-size: clamp(1.2em, 4vw, 1.8em);
     font-weight: 900;
     letter-spacing: 3px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    line-height: 1.3;
   }
-  .result.ice-wins .winner-title { color: var(--ice); }
-  .result.fire-wins .winner-title { color: var(--fire); }
-  .result.tie .winner-title { color: var(--gold); }
+  .result.ice-wins .winner-title { color: var(--ice); text-shadow: 0 0 25px var(--ice-glow); }
+  .result.fire-wins .winner-title { color: var(--fire); text-shadow: 0 0 25px var(--fire-glow); }
+  .result.tie .winner-title { color: var(--gold); text-shadow: 0 0 25px rgba(197,160,89,0.5); }
 
-  .result.ice-wins { border-color: rgba(79,179,255,0.25); box-shadow: 0 0 40px var(--ice-glow); }
-  .result.fire-wins { border-color: rgba(255,69,32,0.25); box-shadow: 0 0 40px var(--fire-glow); }
-  .result.tie { border-color: rgba(197,160,89,0.25); box-shadow: 0 0 40px rgba(197,160,89,0.2); }
+  .result.ice-wins { border-color: rgba(79,179,255,0.4); box-shadow: 0 0 50px var(--ice-glow); }
+  .result.fire-wins { border-color: rgba(255,69,32,0.4); box-shadow: 0 0 50px var(--fire-glow); }
+  .result.tie { border-color: rgba(197,160,89,0.4); box-shadow: 0 0 50px rgba(197,160,89,0.3); }
 
   .result .verdict {
     font-size: 13px;
     letter-spacing: 2px;
-    color: #9aa5b5;
+    color: #a0aec0;
     line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  /* Suspense Banner */
+  #suspense-banner {
+    display: none;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--gold-light);
+    margin-bottom: 24px;
+    animation: suspensePulse 0.4s infinite alternate;
+  }
+  @keyframes suspensePulse {
+    from { opacity: 0.6; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1.02); }
   }
 
   /* Connection Status */
   .status {
     position: fixed;
-    bottom: 16px;
+    bottom: 14px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 10px;
@@ -203,13 +321,18 @@
     text-transform: uppercase;
     color: #4a5464;
     transition: color 0.3s;
+    white-space: nowrap;
+    z-index: 10;
   }
   .status.connected { color: #3d9970; }
 </style>
 </head>
 <body>
 
-<div class="container">
+<canvas id="fx-canvas"></canvas>
+<div id="flash-overlay"></div>
+
+<div class="container" id="main-container">
   <div class="sigil">🐉⚔️🐉</div>
   <h1>The Great War</h1>
   <div class="subtitle">Realm Battle Tracker</div>
@@ -230,6 +353,8 @@
       <div class="label">collected</div>
     </div>
   </div>
+
+  <div id="suspense-banner">⚔️ SUMMONING THE IRON THRONE... ⚔️</div>
 
   <button class="throne-btn" id="throne-btn" disabled>
     ⚔️ Who Will Take the Iron Throne? ⚔️
@@ -256,9 +381,136 @@
   const resultTitle = document.getElementById('result-title')
   const resultVerdict = document.getElementById('result-verdict')
   const statusEl = document.getElementById('status')
+  const mainContainer = document.getElementById('main-container')
+  const flashOverlay = document.getElementById('flash-overlay')
+  const suspenseBanner = document.getElementById('suspense-banner')
+  const fxCanvas = document.getElementById('fx-canvas')
+  const ctx = fxCanvas.getContext('2d')
 
   let iceScore = 0
   let fireScore = 0
+  let particles = []
+  let animId = null
+
+  // Resize particle canvas
+  const resizeCanvas = () => {
+    fxCanvas.width = window.innerWidth
+    fxCanvas.height = window.innerHeight
+  }
+  window.addEventListener('resize', resizeCanvas)
+  resizeCanvas()
+
+  // Synthesize epic cinematic sound effects using Web Audio API
+  let audioCtx = null
+  const playCinematicImpact = (type) => {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+      const now = audioCtx.currentTime
+
+      // Deep war horn / gong bass synth
+      const osc1 = audioCtx.createOscillator()
+      const osc2 = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
+
+      osc1.type = 'sawtooth'
+      osc1.frequency.setValueAtTime(type === 'ice' ? 110 : 85, now)
+      osc1.frequency.exponentialRampToValueAtTime(35, now + 1.2)
+
+      osc2.type = 'sine'
+      osc2.frequency.setValueAtTime(type === 'ice' ? 220 : 170, now)
+      osc2.frequency.exponentialRampToValueAtTime(45, now + 1.4)
+
+      gain.gain.setValueAtTime(0.35, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5)
+
+      osc1.connect(gain)
+      osc2.connect(gain)
+      gain.connect(audioCtx.destination)
+
+      osc1.start(now)
+      osc2.start(now)
+      osc1.stop(now + 1.5)
+      osc2.stop(now + 1.5)
+    } catch(e) {}
+  }
+
+  // Particle explosion logic
+  const spawnParticles = (type) => {
+    const cx = window.innerWidth / 2
+    const cy = window.innerHeight / 2
+    particles = []
+
+    const count = 180
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2
+      const speed = 2 + Math.random() * 12
+      const size = 3 + Math.random() * 8
+      const life = 60 + Math.random() * 60
+
+      let color
+      if (type === 'ice') {
+        const blues = ['#4fb3ff', '#a0dcff', '#ffffff', '#70c5ff', '#1f70b0']
+        color = blues[Math.floor(Math.random() * blues.length)]
+      } else if (type === 'fire') {
+        const reds = ['#ff4520', '#ff825a', '#ffcc00', '#ffffff', '#d43000']
+        color = reds[Math.floor(Math.random() * reds.length)]
+      } else {
+        const golds = ['#c5a059', '#e5c178', '#4fb3ff', '#ff4520', '#ffffff']
+        color = golds[Math.floor(Math.random() * golds.length)]
+      }
+
+      particles.push({
+        x: cx,
+        y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - (type === 'fire' ? 1.5 : 0),
+        size,
+        color,
+        life,
+        maxLife: life,
+        spin: (Math.random() - 0.5) * 0.2
+      })
+    }
+
+    if (!animId) loopParticles()
+  }
+
+  const loopParticles = () => {
+    ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height)
+    let alive = 0
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i]
+      if (p.life > 0) {
+        p.x += p.vx
+        p.y += p.vy
+        p.vx *= 0.98
+        p.vy *= 0.98
+        p.life--
+        const alpha = p.life / p.maxLife
+
+        ctx.save()
+        ctx.globalAlpha = alpha
+        ctx.fillStyle = p.color
+        ctx.shadowColor = p.color
+        ctx.shadowBlur = 10
+
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+
+        alive++
+      }
+    }
+
+    if (alive > 0) {
+      animId = requestAnimationFrame(loopParticles)
+    } else {
+      animId = null
+      ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height)
+    }
+  }
 
   const updateScores = (ice, fire) => {
     iceScore = ice
@@ -284,41 +536,65 @@
   throneBtn.addEventListener('click', () => {
     const finalIce = iceScore
     const finalFire = fireScore
+    const winnerType = finalIce > finalFire ? 'ice' : (finalFire > finalIce ? 'fire' : 'tie')
 
+    // 1. Play cinematic sound
+    playCinematicImpact(winnerType)
+
+    // 2. Trigger screen shake
+    document.body.classList.remove('screen-shake')
+    void document.body.offsetWidth // reflow
+    document.body.classList.add('screen-shake')
+
+    // 3. Trigger flash overlay
+    flashOverlay.className = `flash flash-${winnerType}`
+    setTimeout(() => { flashOverlay.className = '' }, 500)
+
+    // 4. Trigger particle explosion
+    spawnParticles(winnerType)
+
+    // 5. Hide button & show suspense teaser banner
+    throneBtn.style.display = 'none'
+    suspenseBanner.style.display = 'block'
     resultEl.classList.remove('show', 'ice-wins', 'fire-wins', 'tie')
 
-    // Reveal winner based on final scores
-    if (finalIce > finalFire) {
-      resultEl.classList.add('show', 'ice-wins')
-      resultCrown.textContent = '❄️👑🐉'
-      resultTitle.textContent = 'THE NIGHT KING TAKES THE IRON THRONE'
-      resultVerdict.innerHTML = `Viserion's icy breath freezes the realm.<br>Ice ${finalIce} — Fire ${finalFire}`
-    } else if (finalFire > finalIce) {
-      resultEl.classList.add('show', 'fire-wins')
-      resultCrown.textContent = '🔥👑🐉'
-      resultTitle.textContent = 'DAENERYS TAKES THE IRON THRONE'
-      resultVerdict.innerHTML = `Drogon's fire melts the Iron Throne and forges a new world.<br>Fire ${finalFire} — Ice ${finalIce}`
-    } else {
-      resultEl.classList.add('show', 'tie')
-      resultCrown.textContent = '⚖️👑⚔️'
-      resultTitle.textContent = 'THE REALM IS DIVIDED'
-      resultVerdict.innerHTML = `Neither fire nor ice prevails. The war continues.<br>Ice ${finalIce} — Fire ${finalFire}`
-    }
+    // 6. Reveal victor after 1 second of dramatic suspense
+    setTimeout(() => {
+      suspenseBanner.style.display = 'none'
+      throneBtn.style.display = 'inline-block'
 
-    // Reset counters to zero immediately
-    updateScores(0, 0)
-
-    // Notify relay server to reset all stored scores to zero for the next battle
-    try {
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ type: 'reset' }))
+      if (winnerType === 'ice') {
+        resultEl.classList.add('show', 'ice-wins')
+        resultCrown.textContent = '❄️👑🐉'
+        resultTitle.textContent = 'THE NIGHT KING TAKES THE IRON THRONE'
+        resultVerdict.innerHTML = `Viserion's icy blizzard freezes the realm.<br>Ice ${finalIce} — Fire ${finalFire}`
+      } else if (winnerType === 'fire') {
+        resultEl.classList.add('show', 'fire-wins')
+        resultCrown.textContent = '🔥👑🐉'
+        resultTitle.textContent = 'DAENERYS TAKES THE IRON THRONE'
+        resultVerdict.innerHTML = `Drogon's inferno melts the Iron Throne and creates a new dynasty.<br>Fire ${finalFire} — Ice ${finalIce}`
+      } else {
+        resultEl.classList.add('show', 'tie')
+        resultCrown.textContent = '⚖️👑⚔️'
+        resultTitle.textContent = 'THE REALM IS DIVIDED'
+        resultVerdict.innerHTML = `Neither fire nor ice prevails. The war continues.<br>Ice ${finalIce} — Fire ${finalFire}`
       }
-      fetch(`${httpRelay}/reset?room=${encodeURIComponent(room)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        mode: 'cors'
-      }).catch(() => {})
-    } catch(e) {}
+
+      // Reset counters to zero immediately
+      updateScores(0, 0)
+
+      // Notify relay server to reset all stored scores to zero for the next battle
+      try {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ type: 'reset' }))
+        }
+        fetch(`${httpRelay}/reset?room=${encodeURIComponent(room)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          mode: 'cors'
+        }).catch(() => {})
+      } catch(e) {}
+    }, 1000)
   })
 
   // WebSocket auto-connect
