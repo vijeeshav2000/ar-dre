@@ -57,7 +57,7 @@ _s.textContent=`
 document.head.appendChild(_s);
 const _d=document.createElement("div");
 _d.id="element-picker";
-_d.innerHTML='<h1>THE GREAT WAR</h1><div class="sub">CHOOSE YOUR DRAGON ALLEGIANCE</div><div class="ch"><button class="ice" data-el="ice"><span class="icon">\u2744\uFE0F\uD83D\uDC09</span>NIGHT KING<span class="sl">VISERION (ICE)</span></button><button class="fire" data-el="fire"><span class="icon">\uD83D\uDD25\uD83D\uDC09</span>DAENERYS<span class="sl">DROGON (FIRE)</span></button></div>';
+_d.innerHTML='<h1>A SONG OF ICE AND FIRE</h1><div class="sub">CHOOSE YOUR DRAGON ALLEGIANCE</div><div class="ch"><button class="ice" data-el="ice"><span class="icon">\u2744\uFE0F\uD83D\uDC09</span>NIGHT KING<span class="sl">VISERION (ICE)</span></button><button class="fire" data-el="fire"><span class="icon">\uD83D\uDD25\uD83D\uDC09</span>DAENERYS<span class="sl">DROGON (FIRE)</span></button></div>';
 const _mount=()=>{
 (document.body||document.documentElement).appendChild(_d);
 _d.querySelectorAll("button").forEach(b=>{
