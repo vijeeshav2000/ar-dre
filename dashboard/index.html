@@ -402,10 +402,12 @@
 
   // Synthesize epic cinematic sound effects & Game of Thrones theme melody
   let audioCtx = null
-  let themeAudio = new Audio('assets/got-theme.mp3') // Will play if user places got-theme.mp3 in assets folder
+  const themeAudio = new Audio('assets/got-theme.mp3')
+  themeAudio.volume = 0.85
 
   const playGotThemeMelody = () => {
     // 1. Try playing custom MP3 if available
+    themeAudio.currentTime = 0
     themeAudio.play().catch(() => {
       // 2. If no MP3 is found, synthesize the iconic Game of Thrones Theme melody live!
       try {
