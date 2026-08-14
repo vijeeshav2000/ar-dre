@@ -575,9 +575,9 @@
         resultVerdict.innerHTML = `Drogon's inferno melts the Iron Throne and creates a new dynasty.<br>Fire ${finalFire} — Ice ${finalIce}`
       } else {
         resultEl.classList.add('show', 'tie')
-        resultCrown.textContent = '⚖️👑⚔️'
-        resultTitle.textContent = 'THE REALM IS DIVIDED'
-        resultVerdict.innerHTML = `Neither fire nor ice prevails. The war continues.<br>Ice ${finalIce} — Fire ${finalFire}`
+        resultCrown.textContent = '⚔️⚖️🛡️'
+        resultTitle.textContent = 'NO ONE TAKES THE IRON THRONE'
+        resultVerdict.innerHTML = `Fire and Ice have clashed to an exact standstill.<br>Ice ${finalIce} — Fire ${finalFire}<br><span style="color:var(--gold);font-weight:700;letter-spacing:1.5px;display:inline-block;margin-top:6px">THE IRON THRONE STANDS EMPTY</span>`
       }
 
       // Reset counters to zero immediately
