@@ -368,6 +368,27 @@
   }
 
   connect()
+
+  // 1-second background state polling fallback (guarantees real-time sync with 0 page refreshes)
+  const httpRelay = relay.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:')
+  const pollState = async () => {
+    try {
+      const res = await fetch(`${httpRelay}/state?room=${encodeURIComponent(room)}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data && data.scores) {
+          let totalIce = 0, totalFire = 0
+          Object.values(data.scores).forEach(s => {
+            totalIce += (s.ice || 0)
+            totalFire += (s.fire || 0)
+          })
+          updateScores(totalIce, totalFire)
+        }
+      }
+    } catch(e) {}
+  }
+  setInterval(pollState, 1000)
+  pollState()
 })()
 </script>
 
