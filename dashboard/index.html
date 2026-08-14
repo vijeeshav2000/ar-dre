@@ -9,8 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #06080d;
-    --gold: #c5a059;
+    --bg: #000000;
+    --gold: #d7b97e;
+    --gold-dim: #9a8253;
     --gold-light: #e5c178;
     --ice: #4fb3ff;
     --fire: #ff4520;
@@ -40,18 +41,6 @@
     height: 100vh;
     pointer-events: none;
     z-index: 99;
-  }
-
-  /* Atmospheric Background Effect */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(circle at 20% 30%, rgba(79,179,255,0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 30%, rgba(255,69,32,0.08) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
   }
 
   /* Screen shake animation */
@@ -90,33 +79,43 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 620px;
+    max-width: 640px;
     padding: 36px 20px;
     text-align: center;
   }
 
-  .sigil {
-    font-size: 42px;
-    letter-spacing: 12px;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 0 16px rgba(197,160,89,0.4));
+  .got-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6em, 5vw, 2.5em);
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    line-height: 1.25;
+    margin-bottom: 6px;
+    text-shadow: 0 0 25px rgba(215, 185, 126, 0.3);
   }
 
-  h1 {
-    font-family: 'Cinzel Decorative', serif;
-    font-weight: 900;
-    font-size: clamp(1.5em, 5.5vw, 2.3em);
-    letter-spacing: 3px;
-    color: var(--gold);
-    margin-bottom: 6px;
-    text-shadow: 0 0 20px rgba(197,160,89,0.3);
+  span.o-char {
+    display: inline-block;
+    position: relative;
+  }
+  span.o-char::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    bottom: 15%;
+    left: 50%;
+    width: 2px;
+    background: var(--gold);
+    transform: translateX(-50%);
   }
 
   .subtitle {
     font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #7a8494;
+    color: #9a8f7a;
     margin-bottom: 36px;
   }
 
@@ -130,12 +129,12 @@
 
   .score-card {
     flex: 1;
-    max-width: 210px;
-    padding: 26px 14px;
-    border-radius: 18px;
-    background: rgba(12,16,24,0.85);
-    border: 1px solid rgba(255,255,255,0.06);
-    backdrop-filter: blur(8px);
+    max-width: 230px;
+    padding: 26px 16px;
+    border-radius: 20px;
+    background: rgba(10, 10, 12, 0.9);
+    border: 1px solid rgba(215, 185, 126, 0.2);
+    backdrop-filter: blur(10px);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
@@ -143,25 +142,25 @@
 
   .score-card.ice.active {
     box-shadow: 0 0 35px var(--ice-glow);
-    border-color: rgba(79,179,255,0.5);
+    border-color: rgba(79,179,255,0.7);
     transform: translateY(-3px);
   }
   .score-card.fire.active {
     box-shadow: 0 0 35px var(--fire-glow);
-    border-color: rgba(255,69,32,0.5);
+    border-color: rgba(255,69,32,0.7);
     transform: translateY(-3px);
   }
 
   .score-card .team-icon { font-size: 34px; margin-bottom: 8px; }
   .score-card .team-name {
     font-size: 10px;
-    letter-spacing: 2.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: #7a8494;
+    color: #8c8270;
     margin-bottom: 4px;
   }
   .score-card .leader-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.5px;
     margin-bottom: 12px;
@@ -170,8 +169,8 @@
   .score-card.fire .leader-name { color: var(--fire); }
 
   .score-card .count {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 52px;
+    font-family: 'Cinzel', serif;
+    font-size: 54px;
     font-weight: 900;
     line-height: 1;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -183,33 +182,33 @@
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #5a6474;
+    color: #706858;
     margin-top: 6px;
   }
 
   /* Throne Button */
   .throne-btn {
     display: inline-block;
-    padding: 18px 36px;
-    border: 2px solid var(--gold);
-    border-radius: 14px;
-    background: rgba(197,160,89,0.08);
-    color: var(--gold-light);
+    padding: 16px 36px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--gold);
     font-family: 'Cinzel', serif;
-    font-size: clamp(13px, 3vw, 15px);
+    font-size: clamp(12px, 2.5vw, 14px);
     font-weight: 700;
-    letter-spacing: 2.5px;
+    letter-spacing: 3px;
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s;
     margin-bottom: 28px;
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
   }
   .throne-btn:hover:not(:disabled) {
-    background: rgba(197,160,89,0.22);
-    box-shadow: 0 0 35px rgba(197,160,89,0.4);
-    transform: scale(1.02);
+    border-color: var(--gold);
+    color: #ffffff;
+    box-shadow: 0 0 35px var(--gold-glow);
+    transform: scale(1.03);
   }
   .throne-btn:active:not(:disabled) {
     transform: scale(0.97);
@@ -217,23 +216,16 @@
   .throne-btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
-    border-color: rgba(197,160,89,0.2);
-  }
-  .throne-btn.pulsing {
-    animation: btnPulse 0.5s infinite alternate;
-  }
-  @keyframes btnPulse {
-    from { box-shadow: 0 0 15px rgba(197,160,89,0.3); }
-    to { box-shadow: 0 0 40px rgba(197,160,89,0.8); }
+    border-color: rgba(215, 185, 126, 0.15);
   }
 
   /* Result Reveal */
   .result {
     display: none;
-    padding: 36px 22px;
+    padding: 32px 20px;
     border-radius: 18px;
-    background: rgba(10,14,22,0.92);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(8, 8, 10, 0.95);
+    border: 1px solid rgba(215, 185, 126, 0.3);
     backdrop-filter: blur(14px);
     position: relative;
   }
@@ -246,51 +238,39 @@
     0% {
       opacity: 0;
       transform: translateY(30px) scale(0.85);
-      filter: blur(10px);
-    }
-    50% {
-      filter: blur(0px);
     }
     100% {
       opacity: 1;
       transform: translateY(0) scale(1);
-      filter: blur(0px);
     }
   }
 
   .result .crown {
-    font-size: 60px;
-    margin-bottom: 12px;
+    font-size: 56px;
+    margin-bottom: 10px;
     display: inline-block;
-    animation: crownPop 0.8s cubic-bezier(0.16, 1, 0.3, 1) both 0.2s;
-  }
-
-  @keyframes crownPop {
-    0% { transform: scale(0.2) rotate(-15deg); opacity: 0; }
-    70% { transform: scale(1.25) rotate(5deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
 
   .result .winner-title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(1.2em, 4vw, 1.8em);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.2em, 3.8vw, 1.7em);
     font-weight: 900;
     letter-spacing: 3px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     line-height: 1.3;
   }
   .result.ice-wins .winner-title { color: var(--ice); text-shadow: 0 0 25px var(--ice-glow); }
   .result.fire-wins .winner-title { color: var(--fire); text-shadow: 0 0 25px var(--fire-glow); }
-  .result.tie .winner-title { color: var(--gold); text-shadow: 0 0 25px rgba(197,160,89,0.5); }
+  .result.tie .winner-title { color: var(--gold); text-shadow: 0 0 25px rgba(215, 185, 126, 0.5); }
 
-  .result.ice-wins { border-color: rgba(79,179,255,0.4); box-shadow: 0 0 50px var(--ice-glow); }
-  .result.fire-wins { border-color: rgba(255,69,32,0.4); box-shadow: 0 0 50px var(--fire-glow); }
-  .result.tie { border-color: rgba(197,160,89,0.4); box-shadow: 0 0 50px rgba(197,160,89,0.3); }
+  .result.ice-wins { border-color: rgba(79,179,255,0.5); box-shadow: 0 0 50px var(--ice-glow); }
+  .result.fire-wins { border-color: rgba(255,69,32,0.5); box-shadow: 0 0 50px var(--fire-glow); }
+  .result.tie { border-color: rgba(215,185,126,0.5); box-shadow: 0 0 50px rgba(215,185,126,0.3); }
 
   .result .verdict {
     font-size: 13px;
     letter-spacing: 2px;
-    color: #a0aec0;
+    color: #c9bca0;
     line-height: 1.6;
     margin-top: 8px;
   }
@@ -298,8 +278,8 @@
   /* Suspense Banner */
   #suspense-banner {
     display: none;
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 16px;
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
     letter-spacing: 3px;
     color: var(--gold-light);
     margin-bottom: 24px;
@@ -319,7 +299,7 @@
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #4a5464;
+    color: #60584a;
     transition: color 0.3s;
     white-space: nowrap;
     z-index: 10;
@@ -333,23 +313,25 @@
 <div id="flash-overlay"></div>
 
 <div class="container" id="main-container">
-  <div class="sigil">🐉⚔️🐉</div>
-  <h1>A Song of Ice and Fire</h1>
-  <div class="subtitle">Realm Battle Tracker</div>
+  <h1 class="got-title">
+    A S<span class="o-char">O</span>NG <span class="o-char">O</span>F<br>
+    FIRE AND ICE
+  </h1>
+  <div class="subtitle">MATTER VS ANTIMATTER &middot; REALM BATTLE TRACKER</div>
 
   <div class="scores">
-    <div class="score-card ice" id="ice-card">
-      <div class="team-icon">❄️🐉</div>
-      <div class="team-name">The Night King</div>
-      <div class="leader-name">VISERION</div>
-      <div class="count" id="ice-count">0</div>
+    <div class="score-card fire" id="fire-card">
+      <div class="team-icon">🔥</div>
+      <div class="team-name">PLAYER 1 &middot; MATTER</div>
+      <div class="leader-name">DAENERYS (FIRE)</div>
+      <div class="count" id="fire-count">0</div>
       <div class="label">collected</div>
     </div>
-    <div class="score-card fire" id="fire-card">
-      <div class="team-icon">🔥🐉</div>
-      <div class="team-name">Daenerys</div>
-      <div class="leader-name">DROGON</div>
-      <div class="count" id="fire-count">0</div>
+    <div class="score-card ice" id="ice-card">
+      <div class="team-icon">❄️</div>
+      <div class="team-name">PLAYER 2 &middot; ANTIMATTER</div>
+      <div class="leader-name">NIGHT KING (ICE)</div>
+      <div class="count" id="ice-count">0</div>
       <div class="label">collected</div>
     </div>
   </div>
@@ -357,7 +339,7 @@
   <div id="suspense-banner">⚔️ SUMMONING THE IRON THRONE... ⚔️</div>
 
   <button class="throne-btn" id="throne-btn" disabled>
-    ⚔️ Who Will Take the Iron Throne? ⚔️
+    ⚔️ WHO WILL TAKE THE IRON THRONE? ⚔️
   </button>
 
   <div class="result" id="result">

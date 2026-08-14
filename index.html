@@ -3,15 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Great War — A Song of Ice and Fire</title>
+<title>A Song of Fire and Ice — Fire, Ice and the Universe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-dark: #06080d;
-    --gold: #c5a059;
-    --gold-light: #e5c178;
+    --bg-dark: #000000;
+    --gold: #d7b97e;
+    --gold-dim: #9a8253;
+    --gold-glow: rgba(215, 185, 126, 0.4);
     --ice: #4fb3ff;
     --fire: #ff4520;
   }
@@ -23,129 +24,381 @@
     color: #e2e8f0;
     font-family: 'Cinzel', serif;
     min-height: 100vh;
+    width: 100vw;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow-x: hidden;
+    user-select: none;
   }
 
-  /* Atmospheric Ambient Glow Background */
-  body::before {
-    content: '';
-    position: fixed;
+  /* Slide Container */
+  .slide-viewport {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-width: 1200px;
+    max-height: 850px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .slide {
+    position: absolute;
     inset: 0;
-    background: 
-      radial-gradient(circle at 20% 30%, rgba(79, 179, 255, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 80% 30%, rgba(255, 69, 32, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 50% 80%, rgba(197, 160, 89, 0.08) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
     pointer-events: none;
-    z-index: 0;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(0.96);
+    padding: 30px 20px;
   }
 
-  .container {
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+
+  /* Typography matching the exact GOT reference */
+  .got-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2rem, 5.5vw, 3.8rem);
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-transform: uppercase;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    text-shadow: 0 0 30px rgba(215, 185, 126, 0.3);
+  }
+
+  .got-title span.o-char {
+    display: inline-block;
+    position: relative;
+  }
+  .got-title span.o-char::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    bottom: 15%;
+    left: 50%;
+    width: 2px;
+    background: var(--gold);
+    transform: translateX(-50%);
+  }
+
+  .got-subtitle {
+    font-size: clamp(0.95rem, 2.2vw, 1.35rem);
+    line-height: 1.8;
+    color: #c9bca0;
+    max-width: 780px;
+    margin-bottom: 36px;
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
+
+  /* Thin Golden Pill Button from Reference */
+  .got-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 44px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(13px, 2vw, 16px);
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+  }
+
+  .got-btn:hover {
+    border-color: var(--gold);
+    color: #ffffff;
+    box-shadow: 0 0 30px var(--gold-glow);
+    transform: scale(1.04);
+  }
+
+  .got-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Slide 1 Elements */
+  .yin-yang-emblem {
+    width: min(340px, 50vw);
+    height: min(340px, 50vw);
+    margin: 10px auto 36px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 40px rgba(79, 179, 255, 0.35)) drop-shadow(0 0 40px rgba(255, 69, 32, 0.35));
+    animation: rotateSubtle 30s linear infinite;
+  }
+  @keyframes rotateSubtle {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Slide 2 Dual Dragons Image */
+  .dragons-hero {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    max-width: 480px;
-    padding: 40px 24px;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .slide-2-content {
     position: relative;
     z-index: 1;
+    max-width: 720px;
+    padding: 0 20px;
+  }
+
+  /* Slide 3 Cosmology Text Block */
+  .slide-3-text {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.1rem, 2.8vw, 1.7rem);
+    line-height: 2.1;
+    letter-spacing: 3px;
+    color: var(--gold);
+    max-width: 900px;
+    text-align: center;
+    margin-bottom: 48px;
+    text-transform: uppercase;
+  }
+
+  /* Slide 4 Player Choice Visuals */
+  .players-container {
+    display: flex;
+    justify-content: center;
+    gap: clamp(40px, 10vw, 140px);
+    margin: 20px 0 44px;
+  }
+
+  .player-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
   }
 
-  .sigil {
-    font-size: 42px;
-    letter-spacing: 14px;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 0 16px rgba(197, 160, 89, 0.4));
+  .flame-img {
+    width: clamp(120px, 20vw, 200px);
+    height: clamp(160px, 26vw, 260px);
+    object-fit: contain;
+    margin-bottom: 18px;
+    filter: drop-shadow(0 0 30px rgba(255, 69, 32, 0.6));
+    animation: floatAnim 4s ease-in-out infinite alternate;
+  }
+  .flame-img.ice-flame {
+    filter: drop-shadow(0 0 30px rgba(79, 179, 255, 0.6));
+    animation-delay: -2s;
+  }
+  @keyframes floatAnim {
+    from { transform: translateY(0px) scale(1); }
+    to { transform: translateY(-10px) scale(1.03); }
   }
 
-  h1 {
-    font-family: 'Cinzel Decorative', serif;
-    font-weight: 900;
-    font-size: clamp(1.8em, 6vw, 2.5em);
+  .player-label {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     letter-spacing: 4px;
     color: var(--gold);
-    margin-bottom: 36px;
-    text-shadow: 0 0 24px rgba(197, 160, 89, 0.3);
+    margin-bottom: 6px;
     text-transform: uppercase;
   }
 
-  /* Buttons */
-  .button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+  .player-desc {
+    font-size: clamp(0.75rem, 1.6vw, 0.95rem);
+    letter-spacing: 2px;
+    color: #a09580;
+    text-transform: uppercase;
   }
 
-  .portal-btn {
+  /* Slide 5 QR Scanner */
+  .qr-box {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px auto 30px;
+    width: min(220px, 45vw);
+    height: min(220px, 45vw);
+    box-shadow: 0 0 40px rgba(215, 185, 126, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 22px 28px;
-    border-radius: 16px;
-    text-decoration: none;
-    font-family: 'Cinzel', serif;
-    font-size: clamp(14px, 3.5vw, 16px);
+  }
+  .qr-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .scan-desc {
+    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    color: #c9bca0;
+    margin-bottom: 36px;
+    letter-spacing: 2px;
+  }
+  .scan-desc strong {
+    color: var(--gold);
     font-weight: 700;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: #ffffff;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
   }
 
-  .portal-btn:hover {
-    transform: translateY(-3px) scale(1.02);
+  .nav-dots {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 10;
   }
-
-  .portal-btn:active {
-    transform: translateY(0) scale(0.98);
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(215, 185, 126, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
   }
-
-  .portal-btn.ar-btn {
-    background: radial-gradient(circle at center, rgba(255, 69, 32, 0.25) 0%, rgba(30, 10, 10, 0.9) 100%);
-    border: 2px solid rgba(255, 69, 32, 0.6);
-  }
-
-  .portal-btn.ar-btn:hover {
-    border-color: rgba(255, 69, 32, 1);
-    box-shadow: 0 12px 35px rgba(255, 69, 32, 0.35);
-  }
-
-  .portal-btn.dashboard-btn {
-    background: radial-gradient(circle at center, rgba(79, 179, 255, 0.25) 0%, rgba(10, 20, 32, 0.9) 100%);
-    border: 2px solid rgba(79, 179, 255, 0.6);
-  }
-
-  .portal-btn.dashboard-btn:hover {
-    border-color: rgba(79, 179, 255, 1);
-    box-shadow: 0 12px 35px rgba(79, 179, 255, 0.35);
-  }
-
-  .btn-icon {
-    font-size: 24px;
+  .dot.active {
+    background: var(--gold);
+    box-shadow: 0 0 12px var(--gold);
+    transform: scale(1.3);
   }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="sigil">🐉⚔️🐉</div>
-  <h1>A Song of Ice and Fire</h1>
+<div class="slide-viewport">
 
-  <div class="button-group">
-    <a href="./ar/" class="portal-btn ar-btn">
-      <span class="btn-icon">⚔️</span>
-      <span>Enter AR Battlefield</span>
-    </a>
-
-    <a href="./dashboard/" class="portal-btn dashboard-btn">
-      <span class="btn-icon">🏰</span>
-      <span>Realm Dashboard</span>
-    </a>
+  <!-- SLIDE 1: A SONG OF FIRE AND ICE (Title) -->
+  <div class="slide active" id="slide-1">
+    <h1 class="got-title">
+      A S<span class="o-char">O</span>NG <span class="o-char">O</span>F<br>
+      FIRE AND ICE
+    </h1>
+    <img src="assets/slide1_title.png" alt="Song of Fire and Ice Emblem" class="yin-yang-emblem">
+    <button class="got-btn" onclick="goToSlide(2)">START HERE</button>
   </div>
+
+  <!-- SLIDE 2: FIRE, ICE AND THE UNIVERSE (Lore) -->
+  <div class="slide" id="slide-2">
+    <img src="assets/slide2_dragons.png" alt="Dragons of Fire and Ice" class="dragons-hero">
+    <div class="slide-2-content">
+      <h1 class="got-title" style="font-size: clamp(1.6rem, 4.5vw, 2.8rem);">
+        FIRE, ICE AND THE UNIVERSE
+      </h1>
+      <p class="got-subtitle">
+        In Game of Thrones, the world is shaped by the opposing forces of Fire and Ice.<br><br>
+        Our game reimagines this battle through Matter and Antimatter.
+      </p>
+      <button class="got-btn" onclick="goToSlide(3)">C<span class="o-char">O</span>NTINUE</button>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: MATTER & ANTIMATTER COSMOLOGY -->
+  <div class="slide" id="slide-3">
+    <div class="slide-3-text">
+      AT THE BEGINNING <span class="o-char">O</span>F THE UNIVERSE, MATTER AND ANTIMATTER WERE CREATED IN ALM<span class="o-char">O</span>ST EQUAL AM<span class="o-char">O</span>UNTS. WHEN THEY MEET, THEY ANNIHILATE EACH <span class="o-char">O</span>THER. BUT A TINY EXCESS <span class="o-char">O</span>F MATTER SURVIVED — ALL<span class="o-char">O</span>WING STARS, PLANETS, AND LIFE T<span class="o-char">O</span> EXIST.
+    </div>
+    <button class="got-btn" onclick="goToSlide(4)">C<span class="o-char">O</span>NTINUE</button>
+  </div>
+
+  <!-- SLIDE 4: PLAYER 1 vs PLAYER 2 -->
+  <div class="slide" id="slide-4">
+    <h1 class="got-title" style="font-size: clamp(1.5rem, 4.2vw, 2.6rem);">
+      N<span class="o-char">O</span>W, Y<span class="o-char">O</span>U DECIDE WHAT SURVIVES.
+    </h1>
+
+    <div class="players-container">
+      <div class="player-box">
+        <img src="assets/slide4_players.png" alt="Matter / Fire" class="flame-img" style="object-position: 25% center; object-fit: cover; width: 140px; height: 220px;">
+        <div class="player-label">PLAYER 1</div>
+        <div class="player-desc">Collect Matter /<br>Fire particles</div>
+      </div>
+
+      <div class="player-box">
+        <img src="assets/slide4_players.png" alt="Antimatter / Ice" class="flame-img ice-flame" style="object-position: 75% center; object-fit: cover; width: 140px; height: 220px;">
+        <div class="player-label">PLAYER 2</div>
+        <div class="player-desc">Collect Antimatter /<br>Ice particles</div>
+      </div>
+    </div>
+
+    <button class="got-btn" onclick="goToSlide(5)">BEGIN</button>
+  </div>
+
+  <!-- SLIDE 5: SCAN TO PLAY & LAUNCH DASHBOARD -->
+  <div class="slide" id="slide-5">
+    <h1 class="got-title" style="font-size: clamp(1.6rem, 4.5vw, 2.8rem);">
+      SCAN T<span class="o-char">O</span> PLAY
+    </h1>
+
+    <div class="qr-box">
+      <!-- Direct QR code to mobile AR experience -->
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fvijeeshav2000.github.io%2Far-dre%2Far%2F&color=000000" alt="Scan to play AR Game">
+    </div>
+
+    <p class="scan-desc">
+      Two players have <strong>30 seconds to collect</strong> particles around the installation.
+    </p>
+
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+      <a href="./ar/" class="got-btn" style="border-color: var(--fire);">⚔️ PLAY ON THIS DEVICE</a>
+      <a href="./dashboard/" class="got-btn" style="border-color: var(--gold);">C<span class="o-char">O</span>NTINUE TO DASHBOARD &rarr;</a>
+    </div>
+  </div>
+
 </div>
+
+<div class="nav-dots">
+  <div class="dot active" onclick="goToSlide(1)"></div>
+  <div class="dot" onclick="goToSlide(2)"></div>
+  <div class="dot" onclick="goToSlide(3)"></div>
+  <div class="dot" onclick="goToSlide(4)"></div>
+  <div class="dot" onclick="goToSlide(5)"></div>
+</div>
+
+<script>
+  let currentSlide = 1
+  const totalSlides = 5
+
+  const goToSlide = (n) => {
+    currentSlide = n
+    document.querySelectorAll('.slide').forEach((s, idx) => {
+      s.classList.toggle('active', idx + 1 === n)
+    })
+    document.querySelectorAll('.dot').forEach((d, idx) => {
+      d.classList.toggle('active', idx + 1 === n)
+    })
+  }
+
+  // Keyboard navigation support
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'Space') {
+      if (currentSlide < totalSlides) goToSlide(currentSlide + 1)
+    } else if (e.key === 'ArrowLeft') {
+      if (currentSlide > 1) goToSlide(currentSlide - 1)
+    }
+  })
+</script>
 
 </body>
 </html>
