@@ -6,12 +6,12 @@
 <title>A Song of Fire and Ice — Fire, Ice and the Universe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-dark: #000000;
     --gold: #d7b97e;
-    --gold-dim: #9a8253;
+    --gold-dim: #8e7547;
     --gold-glow: rgba(215, 185, 126, 0.4);
     --ice: #4fb3ff;
     --fire: #ff4520;
@@ -32,17 +32,15 @@
     user-select: none;
   }
 
-  /* Slide Container */
+  /* Slide Viewport */
   .slide-viewport {
     position: relative;
     width: 100vw;
     height: 100vh;
-    max-width: 1200px;
-    max-height: 850px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    background: #000000;
   }
 
   .slide {
@@ -55,18 +53,20 @@
     text-align: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    transform: scale(0.96);
-    padding: 30px 20px;
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(0.97);
+    padding: 40px 24px;
+    z-index: 1;
   }
 
   .slide.active {
     opacity: 1;
     pointer-events: auto;
     transform: scale(1);
+    z-index: 2;
   }
 
-  /* Typography matching the exact GOT reference */
+  /* Game of Thrones Typography */
   .got-title {
     font-family: 'Cinzel', serif;
     font-size: clamp(2rem, 5.5vw, 3.8rem);
@@ -75,15 +75,15 @@
     color: var(--gold);
     text-transform: uppercase;
     line-height: 1.25;
-    margin-bottom: 20px;
-    text-shadow: 0 0 30px rgba(215, 185, 126, 0.3);
+    margin-bottom: 24px;
+    text-shadow: 0 0 30px rgba(215, 185, 126, 0.25);
   }
 
-  .got-title span.o-char {
+  span.o-char {
     display: inline-block;
     position: relative;
   }
-  .got-title span.o-char::after {
+  span.o-char::after {
     content: '';
     position: absolute;
     top: 15%;
@@ -94,42 +94,33 @@
     transform: translateX(-50%);
   }
 
-  .got-subtitle {
-    font-size: clamp(0.95rem, 2.2vw, 1.35rem);
-    line-height: 1.8;
-    color: #c9bca0;
-    max-width: 780px;
-    margin-bottom: 36px;
-    letter-spacing: 2px;
-    font-weight: 500;
-  }
-
-  /* Thin Golden Pill Button from Reference */
+  /* Golden Pill Buttons */
   .got-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 14px 44px;
-    border: 1px solid var(--gold-dim);
+    border: 1.5px solid var(--gold-dim);
     border-radius: 999px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     color: var(--gold);
     font-family: 'Cinzel', serif;
-    font-size: clamp(13px, 2vw, 16px);
+    font-size: clamp(13px, 1.8vw, 16px);
     font-weight: 600;
     letter-spacing: 4px;
     text-transform: uppercase;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.4s ease;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+    z-index: 5;
   }
 
   .got-btn:hover {
     border-color: var(--gold);
     color: #ffffff;
-    box-shadow: 0 0 30px var(--gold-glow);
+    box-shadow: 0 0 35px var(--gold-glow);
     transform: scale(1.04);
   }
 
@@ -137,45 +128,62 @@
     transform: scale(0.98);
   }
 
-  /* Slide 1 Elements */
+  /* SLIDE 1: Yin Yang Emblem */
   .yin-yang-emblem {
-    width: min(340px, 50vw);
-    height: min(340px, 50vw);
+    width: min(340px, 48vw);
+    height: min(340px, 48vw);
     margin: 10px auto 36px;
     object-fit: contain;
-    filter: drop-shadow(0 0 40px rgba(79, 179, 255, 0.35)) drop-shadow(0 0 40px rgba(255, 69, 32, 0.35));
-    animation: rotateSubtle 30s linear infinite;
+    filter: drop-shadow(0 0 35px rgba(79, 179, 255, 0.4)) drop-shadow(0 0 35px rgba(255, 69, 32, 0.4));
+    animation: rotateSubtle 35s linear infinite;
   }
   @keyframes rotateSubtle {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
   }
 
-  /* Slide 2 Dual Dragons Image */
-  .dragons-hero {
+  /* SLIDE 2: Left & Right Character Portraits */
+  .character-portrait {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.85;
-    z-index: 0;
+    bottom: 0;
+    height: 90vh;
+    max-height: 800px;
+    object-fit: contain;
     pointer-events: none;
+    z-index: 0;
+  }
+  .character-left {
+    left: 0;
+    mask-image: linear-gradient(to right, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 50%, transparent 100%);
+  }
+  .character-right {
+    right: 0;
+    mask-image: linear-gradient(to left, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, black 50%, transparent 100%);
   }
 
-  .slide-2-content {
+  .slide-2-center {
     position: relative;
-    z-index: 1;
-    max-width: 720px;
+    z-index: 2;
+    max-width: 680px;
     padding: 0 20px;
   }
+  .slide-2-text {
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    line-height: 1.8;
+    color: #c9bca0;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
 
-  /* Slide 3 Cosmology Text Block */
+  /* SLIDE 3: Cosmology Text */
   .slide-3-text {
     font-family: 'Cinzel', serif;
-    font-size: clamp(1.1rem, 2.8vw, 1.7rem);
-    line-height: 2.1;
-    letter-spacing: 3px;
+    font-size: clamp(1.15rem, 2.7vw, 1.75rem);
+    line-height: 2.2;
+    letter-spacing: 4px;
     color: var(--gold);
     max-width: 900px;
     text-align: center;
@@ -183,84 +191,107 @@
     text-transform: uppercase;
   }
 
-  /* Slide 4 Player Choice Visuals */
+  /* SLIDE 4: Players */
   .players-container {
     display: flex;
     justify-content: center;
-    gap: clamp(40px, 10vw, 140px);
-    margin: 20px 0 44px;
+    gap: clamp(40px, 12vw, 160px);
+    margin: 10px 0 44px;
   }
 
-  .player-box {
+  .player-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
 
-  .flame-img {
-    width: clamp(120px, 20vw, 200px);
-    height: clamp(160px, 26vw, 260px);
+  .flame-graphic {
+    width: clamp(120px, 18vw, 180px);
+    height: clamp(180px, 28vw, 270px);
     object-fit: contain;
-    margin-bottom: 18px;
-    filter: drop-shadow(0 0 30px rgba(255, 69, 32, 0.6));
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 30px rgba(255, 69, 32, 0.7));
     animation: floatAnim 4s ease-in-out infinite alternate;
   }
-  .flame-img.ice-flame {
-    filter: drop-shadow(0 0 30px rgba(79, 179, 255, 0.6));
+  .flame-graphic.ice {
+    filter: drop-shadow(0 0 30px rgba(79, 179, 255, 0.7));
     animation-delay: -2s;
   }
   @keyframes floatAnim {
-    from { transform: translateY(0px) scale(1); }
-    to { transform: translateY(-10px) scale(1.03); }
+    from { transform: translateY(0px); }
+    to { transform: translateY(-12px); }
   }
 
-  .player-label {
+  .player-title {
     font-family: 'Cinzel', serif;
-    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    font-size: clamp(1.1rem, 2.2vw, 1.45rem);
     letter-spacing: 4px;
     color: var(--gold);
     margin-bottom: 6px;
     text-transform: uppercase;
   }
-
-  .player-desc {
-    font-size: clamp(0.75rem, 1.6vw, 0.95rem);
+  .player-subtitle {
+    font-size: clamp(0.75rem, 1.5vw, 0.95rem);
     letter-spacing: 2px;
-    color: #a09580;
+    color: #9a8f7a;
     text-transform: uppercase;
   }
 
-  /* Slide 5 QR Scanner */
-  .qr-box {
+  /* SLIDE 5: QR Scanner & Ambient Side Flames */
+  .ambient-flame-left {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 80vh;
+    object-fit: contain;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+  .ambient-flame-right {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 80vh;
+    object-fit: contain;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .qr-frame {
     background: #ffffff;
     padding: 12px;
     border-radius: 8px;
-    margin: 10px auto 30px;
-    width: min(220px, 45vw);
-    height: min(220px, 45vw);
-    box-shadow: 0 0 40px rgba(215, 185, 126, 0.4);
+    margin: 10px auto 26px;
+    width: min(210px, 44vw);
+    height: min(210px, 44vw);
+    box-shadow: 0 0 35px rgba(215, 185, 126, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    z-index: 2;
   }
-  .qr-box img {
+  .qr-frame img {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
 
-  .scan-desc {
-    font-size: clamp(0.95rem, 2vw, 1.25rem);
+  .scan-info {
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
     color: #c9bca0;
     margin-bottom: 36px;
     letter-spacing: 2px;
+    position: relative;
+    z-index: 2;
   }
-  .scan-desc strong {
+  .scan-info strong {
     color: var(--gold);
     font-weight: 700;
   }
 
+  /* Navigation dots */
   .nav-dots {
     position: fixed;
     bottom: 24px;
@@ -274,13 +305,13 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgba(215, 185, 126, 0.3);
+    background: rgba(215, 185, 126, 0.25);
     cursor: pointer;
     transition: all 0.3s ease;
   }
   .dot.active {
     background: var(--gold);
-    box-shadow: 0 0 12px var(--gold);
+    box-shadow: 0 0 10px var(--gold);
     transform: scale(1.3);
   }
 </style>
@@ -289,24 +320,26 @@
 
 <div class="slide-viewport">
 
-  <!-- SLIDE 1: A SONG OF FIRE AND ICE (Title) -->
+  <!-- SLIDE 1: A SONG OF FIRE AND ICE -->
   <div class="slide active" id="slide-1">
     <h1 class="got-title">
       A S<span class="o-char">O</span>NG <span class="o-char">O</span>F<br>
       FIRE AND ICE
     </h1>
-    <img src="assets/slide1_title.png" alt="Song of Fire and Ice Emblem" class="yin-yang-emblem">
+    <img src="assets/yinyang.png" alt="A Song of Fire and Ice" class="yin-yang-emblem">
     <button class="got-btn" onclick="goToSlide(2)">START HERE</button>
   </div>
 
-  <!-- SLIDE 2: FIRE, ICE AND THE UNIVERSE (Lore) -->
+  <!-- SLIDE 2: FIRE, ICE AND THE UNIVERSE -->
   <div class="slide" id="slide-2">
-    <img src="assets/slide2_dragons.png" alt="Dragons of Fire and Ice" class="dragons-hero">
-    <div class="slide-2-content">
-      <h1 class="got-title" style="font-size: clamp(1.6rem, 4.5vw, 2.8rem);">
+    <img src="assets/nightking_dragon.png" alt="The Night King and Viserion" class="character-portrait character-left">
+    <img src="assets/daenerys_dragon.png" alt="Daenerys and Drogon" class="character-portrait character-right">
+    
+    <div class="slide-2-center">
+      <h1 class="got-title" style="font-size: clamp(1.6rem, 4.2vw, 2.7rem);">
         FIRE, ICE AND THE UNIVERSE
       </h1>
-      <p class="got-subtitle">
+      <p class="slide-2-text">
         In Game of Thrones, the world is shaped by the opposing forces of Fire and Ice.<br><br>
         Our game reimagines this battle through Matter and Antimatter.
       </p>
@@ -314,7 +347,7 @@
     </div>
   </div>
 
-  <!-- SLIDE 3: MATTER & ANTIMATTER COSMOLOGY -->
+  <!-- SLIDE 3: MATTER & ANTIMATTER COSMIC ORIGINS -->
   <div class="slide" id="slide-3">
     <div class="slide-3-text">
       AT THE BEGINNING <span class="o-char">O</span>F THE UNIVERSE, MATTER AND ANTIMATTER WERE CREATED IN ALM<span class="o-char">O</span>ST EQUAL AM<span class="o-char">O</span>UNTS. WHEN THEY MEET, THEY ANNIHILATE EACH <span class="o-char">O</span>THER. BUT A TINY EXCESS <span class="o-char">O</span>F MATTER SURVIVED — ALL<span class="o-char">O</span>WING STARS, PLANETS, AND LIFE T<span class="o-char">O</span> EXIST.
@@ -322,47 +355,48 @@
     <button class="got-btn" onclick="goToSlide(4)">C<span class="o-char">O</span>NTINUE</button>
   </div>
 
-  <!-- SLIDE 4: PLAYER 1 vs PLAYER 2 -->
+  <!-- SLIDE 4: PLAYER 1 vs PLAYER 2 (MATTER VS ANTIMATTER) -->
   <div class="slide" id="slide-4">
-    <h1 class="got-title" style="font-size: clamp(1.5rem, 4.2vw, 2.6rem);">
+    <h1 class="got-title" style="font-size: clamp(1.5rem, 4vw, 2.5rem);">
       N<span class="o-char">O</span>W, Y<span class="o-char">O</span>U DECIDE WHAT SURVIVES.
     </h1>
 
     <div class="players-container">
-      <div class="player-box">
-        <img src="assets/slide4_players.png" alt="Matter / Fire" class="flame-img" style="object-position: 25% center; object-fit: cover; width: 140px; height: 220px;">
-        <div class="player-label">PLAYER 1</div>
-        <div class="player-desc">Collect Matter /<br>Fire particles</div>
+      <div class="player-card">
+        <img src="assets/fire_flame.png" alt="Matter / Fire" class="flame-graphic">
+        <div class="player-title">PLAYER 1</div>
+        <div class="player-subtitle">Collect Matter /<br>Fire particles</div>
       </div>
 
-      <div class="player-box">
-        <img src="assets/slide4_players.png" alt="Antimatter / Ice" class="flame-img ice-flame" style="object-position: 75% center; object-fit: cover; width: 140px; height: 220px;">
-        <div class="player-label">PLAYER 2</div>
-        <div class="player-desc">Collect Antimatter /<br>Ice particles</div>
+      <div class="player-card">
+        <img src="assets/ice_flame.png" alt="Antimatter / Ice" class="flame-graphic ice">
+        <div class="player-title">PLAYER 2</div>
+        <div class="player-subtitle">Collect Antimatter /<br>Ice particles</div>
       </div>
     </div>
 
     <button class="got-btn" onclick="goToSlide(5)">BEGIN</button>
   </div>
 
-  <!-- SLIDE 5: SCAN TO PLAY & LAUNCH DASHBOARD -->
+  <!-- SLIDE 5: SCAN TO PLAY -->
   <div class="slide" id="slide-5">
-    <h1 class="got-title" style="font-size: clamp(1.6rem, 4.5vw, 2.8rem);">
+    <img src="assets/fire_flame.png" alt="Fire" class="ambient-flame-left">
+    <img src="assets/ice_flame.png" alt="Ice" class="ambient-flame-right">
+
+    <h1 class="got-title" style="font-size: clamp(1.6rem, 4.2vw, 2.7rem); position: relative; z-index: 2;">
       SCAN T<span class="o-char">O</span> PLAY
     </h1>
 
-    <div class="qr-box">
-      <!-- Direct QR code to mobile AR experience -->
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fvijeeshav2000.github.io%2Far-dre%2Far%2F&color=000000" alt="Scan to play AR Game">
+    <div class="qr-frame">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fvijeeshav2000.github.io%2Far-dre%2Far%2F&color=000000" alt="QR Code to AR Game">
     </div>
 
-    <p class="scan-desc">
+    <p class="scan-info">
       Two players have <strong>30 seconds to collect</strong> particles around the installation.
     </p>
 
-    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
-      <a href="./ar/" class="got-btn" style="border-color: var(--fire);">⚔️ PLAY ON THIS DEVICE</a>
-      <a href="./dashboard/" class="got-btn" style="border-color: var(--gold);">C<span class="o-char">O</span>NTINUE TO DASHBOARD &rarr;</a>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 2;">
+      <a href="./dashboard/" class="got-btn">C<span class="o-char">O</span>NTINUE</a>
     </div>
   </div>
 
@@ -390,9 +424,9 @@
     })
   }
 
-  // Keyboard navigation support
+  // Keyboard navigation support (Arrow Keys / Spacebar)
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === 'Space') {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
       if (currentSlide < totalSlides) goToSlide(currentSlide + 1)
     } else if (e.key === 'ArrowLeft') {
       if (currentSlide > 1) goToSlide(currentSlide - 1)
