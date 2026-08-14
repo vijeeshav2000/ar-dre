@@ -400,8 +400,77 @@
   window.addEventListener('resize', resizeCanvas)
   resizeCanvas()
 
-  // Synthesize epic cinematic sound effects using Web Audio API
+  // Synthesize epic cinematic sound effects & Game of Thrones theme melody
   let audioCtx = null
+  let themeAudio = new Audio('assets/got-theme.mp3') // Will play if user places got-theme.mp3 in assets folder
+
+  const playGotThemeMelody = () => {
+    // 1. Try playing custom MP3 if available
+    themeAudio.play().catch(() => {
+      // 2. If no MP3 is found, synthesize the iconic Game of Thrones Theme melody live!
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+        const now = audioCtx.currentTime
+
+        // Iconic GOT Main Theme in C-minor: [freq, duration, startOffset]
+        // G3 (196Hz) -> C4 (261Hz) -> D#4 (311Hz) -> F4 (349Hz) -> G4 (392Hz) -> C4 (261Hz) -> D#4 (311Hz) -> D4 (293Hz)
+        const notes = [
+          { f: 196.00, d: 0.6, t: 0.0 }, // G3
+          { f: 261.63, d: 1.0, t: 0.6 }, // C4
+          { f: 311.13, d: 0.35, t: 1.6 }, // D#4
+          { f: 349.23, d: 0.35, t: 1.95 }, // F4
+          { f: 392.00, d: 0.7, t: 2.3 }, // G4
+          { f: 261.63, d: 1.0, t: 3.0 }, // C4
+          { f: 311.13, d: 0.35, t: 4.0 }, // D#4
+          { f: 293.66, d: 1.2, t: 4.35 }, // D4
+          // Second phrase
+          { f: 196.00, d: 0.6, t: 5.6 }, // G3
+          { f: 261.63, d: 1.0, t: 6.2 }, // C4
+          { f: 311.13, d: 0.35, t: 7.2 }, // D#4
+          { f: 349.23, d: 0.35, t: 7.55 }, // F4
+          { f: 392.00, d: 0.7, t: 7.9 }, // G4
+          { f: 261.63, d: 1.0, t: 8.6 }, // C4
+          { f: 311.13, d: 0.35, t: 9.6 }, // D#4
+          { f: 293.66, d: 1.5, t: 9.95 }  // D4
+        ]
+
+        // Lowpass filter for cello body resonance
+        const filter = audioCtx.createBiquadFilter()
+        filter.type = 'lowpass'
+        filter.frequency.setValueAtTime(650, now)
+        filter.Q.setValueAtTime(4.0, now)
+        filter.connect(audioCtx.destination)
+
+        notes.forEach(({ f, d, t }) => {
+          const osc1 = audioCtx.createOscillator()
+          const osc2 = audioCtx.createOscillator()
+          const gain = audioCtx.createGain()
+
+          osc1.type = 'sawtooth'
+          osc1.frequency.setValueAtTime(f, now + t)
+
+          osc2.type = 'triangle'
+          osc2.frequency.setValueAtTime(f * 0.5, now + t) // Cello sub-harmonic
+
+          // Bow attack and decay envelope
+          gain.gain.setValueAtTime(0.001, now + t)
+          gain.gain.linearRampToValueAtTime(0.35, now + t + 0.08)
+          gain.gain.setValueAtTime(0.35, now + t + d - 0.08)
+          gain.gain.exponentialRampToValueAtTime(0.001, now + t + d)
+
+          osc1.connect(gain)
+          osc2.connect(gain)
+          gain.connect(filter)
+
+          osc1.start(now + t)
+          osc2.start(now + t)
+          osc1.stop(now + t + d)
+          osc2.stop(now + t + d)
+        })
+      } catch(e) {}
+    })
+  }
+
   const playCinematicImpact = (type) => {
     try {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
@@ -420,7 +489,7 @@
       osc2.frequency.setValueAtTime(type === 'ice' ? 220 : 170, now)
       osc2.frequency.exponentialRampToValueAtTime(45, now + 1.4)
 
-      gain.gain.setValueAtTime(0.35, now)
+      gain.gain.setValueAtTime(0.4, now)
       gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5)
 
       osc1.connect(gain)
@@ -432,6 +501,9 @@
       osc1.stop(now + 1.5)
       osc2.stop(now + 1.5)
     } catch(e) {}
+
+    // Start playing the iconic GOT Theme melody
+    setTimeout(playGotThemeMelody, 800)
   }
 
   // Particle explosion logic
