@@ -8,6 +8,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+  @font-face {
+    font-family: 'Trajan';
+    src: url('assets/Trajan Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     --bg: #000000;
     --gold: #d7b97e;
@@ -24,7 +32,7 @@
   html, body {
     background: var(--bg);
     color: #e2e8f0;
-    font-family: 'Cinzel', serif;
+    font-family: 'Trajan', 'Cinzel', serif;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -85,7 +93,7 @@
   }
 
   .got-title {
-    font-family: 'Cinzel', serif;
+    font-family: 'Trajan', 'Cinzel', serif;
     font-size: clamp(1.6em, 5vw, 2.5em);
     font-weight: 700;
     letter-spacing: 4px;
@@ -198,7 +206,7 @@
   .score-card.fire .leader-name { color: var(--fire); }
 
   .score-card .count {
-    font-family: 'Cinzel', serif;
+    font-family: 'Trajan', 'Cinzel', serif;
     font-size: 54px;
     font-weight: 900;
     line-height: 1;
@@ -223,7 +231,7 @@
     border-radius: 999px;
     background: linear-gradient(135deg, rgba(160, 230, 255, 0.2) 0%, rgba(30, 95, 165, 0.35) 50%, rgba(8, 24, 48, 0.8) 100%);
     color: #e2f4ff;
-    font-family: 'Cinzel', serif;
+    font-family: 'Trajan', 'Cinzel', serif;
     font-size: clamp(12px, 2.5vw, 14px);
     font-weight: 700;
     letter-spacing: 3px;
@@ -300,7 +308,7 @@
   }
 
   .result .winner-title {
-    font-family: 'Cinzel', serif;
+    font-family: 'Trajan', 'Cinzel', serif;
     font-size: clamp(1.2em, 3.8vw, 1.7em);
     font-weight: 900;
     letter-spacing: 3px;
@@ -326,7 +334,7 @@
   /* Suspense Banner */
   #suspense-banner {
     display: none;
-    font-family: 'Cinzel', serif;
+    font-family: 'Trajan', 'Cinzel', serif;
     font-size: 15px;
     letter-spacing: 3px;
     color: var(--gold-light);
@@ -351,7 +359,7 @@
     border-radius: 999px;
     background: linear-gradient(135deg, rgba(160, 230, 255, 0.18) 0%, rgba(30, 95, 165, 0.3) 50%, rgba(8, 24, 48, 0.7) 100%);
     color: #e2f4ff;
-    font-family: 'Cinzel', serif;
+    font-family: 'Trajan', 'Cinzel', serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 2.5px;
