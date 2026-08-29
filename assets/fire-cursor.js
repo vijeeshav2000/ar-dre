@@ -1,12 +1,14 @@
 /**
- * Hyper-Fast 120FPS Fire & Ice Cursor Engine
- * 100% zero-reflow event architecture (no elementFromPoint).
- * Ultra-responsive, snappy, lightweight particle trail.
+ * Continuous Fire & Ice Mouse Trail
+ * - Spawns continuous glowing flame embers on mouse movement.
+ * - Particles have a 1.5 to 3.0 second lifespan with upward heat drift and gentle flickering.
+ * - Stops creating particles when stationary, resumes immediately when mouse moves.
+ * - Triggers Matter & Antimatter annihilation sparks when interacting with Ice buttons.
  */
 (() => {
   const canvas = document.createElement('canvas');
   canvas.id = 'fire-cursor-canvas';
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;transform:translateZ(0);will-change:transform;';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;transform:translateZ(0);';
   document.body.appendChild(canvas);
 
   const ctx = canvas.getContext('2d', { alpha: true });
@@ -19,18 +21,80 @@
   }, { passive: true });
 
   const particles = [];
-  const MAX_PARTICLES = 40; // Lean, hyper-responsive pool
+  const MAX_PARTICLES = 160;
 
-  // Vibrant, glowing color constants
-  const COLOR_FIRE_CORE = 'rgba(255, 240, 160, ';
-  const COLOR_FIRE_GOLD = 'rgba(255, 170, 30, ';
-  const COLOR_FIRE_FLAME = 'rgba(255, 80, 10, ';
-  const COLOR_FIRE_EMBER = 'rgba(230, 40, 0, ';
-  const COLOR_ICE_SPARK = 'rgba(90, 200, 255, ';
-  const COLOR_ICE_WHITE = 'rgba(220, 250, 255, ';
+  // Fire palette (warm embers)
+  const FIRE_COLORS = [
+    { r: 255, g: 240, b: 150 }, // White-hot core
+    { r: 255, g: 180, b: 40 },  // Brilliant gold
+    { r: 255, g: 90,  b: 15 },  // Vivid flame orange
+    { r: 240, g: 45,  b: 5 },   // Deep crimson ember
+    { r: 200, g: 25,  b: 0 },   // Smoldering red
+  ];
 
-  const FIRE_COLORS = [COLOR_FIRE_CORE, COLOR_FIRE_GOLD, COLOR_FIRE_FLAME, COLOR_FIRE_EMBER];
-  const ICE_COLORS = [COLOR_ICE_SPARK, COLOR_ICE_WHITE, COLOR_FIRE_CORE];
+  // Ice palette (antimatter sparks)
+  const ICE_COLORS = [
+    { r: 220, g: 250, b: 255 }, // Glacial white
+    { r: 80,  g: 190, b: 255 }, // Cyan frost
+    { r: 35,  g: 140, b: 240 }, // Deep blue spark
+  ];
+
+  class FireEmber {
+    constructor(x, y, vx, vy, size, color, maxLifeSeconds = 2.2, isAnnihilation = false) {
+      this.x = x;
+      this.y = y;
+      this.vx = vx;
+      this.vy = vy;
+      this.initSize = size;
+      this.size = size;
+      this.color = color;
+      this.isAnnihilation = isAnnihilation;
+      
+      // Target life between 1.5 and 3.0 seconds (60fps -> ~90 to 180 frames)
+      const totalFrames = maxLifeSeconds * 60;
+      this.life = 1.0;
+      this.decay = 1.0 / totalFrames; // Exact 1.5 - 3.0s lifespan
+      
+      this.flickerSpeed = Math.random() * 0.15 + 0.05;
+      this.flickerOffset = Math.random() * Math.PI * 2;
+      this.wobbleSpeed = Math.random() * 0.08 + 0.03;
+      this.wobbleAmp = Math.random() * 0.6 + 0.2;
+    }
+
+    update(frame) {
+      // Natural thermal buoyancy (drifts upward and gently slows down horizontally)
+      this.x += this.vx + Math.sin(frame * this.wobbleSpeed + this.flickerOffset) * this.wobbleAmp;
+      this.y += this.vy;
+
+      this.vy -= 0.025; // Gentle upward lift as heat rises
+      this.vx *= 0.985; // Very low drag for smooth drifting
+
+      this.life -= this.decay;
+      // Shrink gently over the 1.5 - 3.0s lifetime
+      this.size = Math.max(0.2, this.initSize * Math.pow(this.life, 0.65));
+    }
+
+    draw(ctx, frame) {
+      if (this.life <= 0 || this.size <= 0.1) return;
+
+      // Realistic flame flicker
+      const flicker = 0.85 + Math.sin(frame * this.flickerSpeed + this.flickerOffset) * 0.15;
+      const alpha = Math.max(0, this.life * flicker);
+
+      ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha * 0.9})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Incandescent bright core
+      if (this.size > 1.2 && alpha > 0.3) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
 
   let mouseX = -100;
   let mouseY = -100;
@@ -38,167 +102,129 @@
   let lastY = -100;
   let isOverIce = false;
   let animId = null;
+  let frameCount = 0;
 
-  // Zero-reflow hover detection via delegated mouseover
+  // Zero-reflow hover detection for Ice buttons
   document.addEventListener('mouseover', (e) => {
     if (e.target && e.target.closest) {
       isOverIce = !!e.target.closest('.got-btn, .throne-btn, .home-btn, button, a');
     }
   }, { passive: true });
 
-  class Spark {
-    constructor(x, y, vx, vy, size, colorBase, isAnnihilation) {
-      this.x = x;
-      this.y = y;
-      this.vx = vx;
-      this.vy = vy;
-      this.size = size;
-      this.colorBase = colorBase;
-      this.isAnnihilation = isAnnihilation;
-      this.life = 1.0;
-      // Snappy, energetic decay for instant responsiveness
-      this.decay = isAnnihilation ? 0.065 : (Math.random() * 0.045 + 0.04);
-    }
-
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      this.vy -= 0.08; // Quick upward buoyant rise
-      this.vx *= 0.94;
-      this.size *= 0.93;
-      this.life -= this.decay;
-    }
-
-    draw(ctx) {
-      if (this.life <= 0 || this.size < 0.3) return;
-      const alpha = this.life;
-
-      ctx.fillStyle = this.colorBase + (alpha * 0.95) + ')';
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, 6.2831853);
-      ctx.fill();
-
-      // Sharp radiant white-hot micro-center
-      if (this.size > 1.2 && alpha > 0.4) {
-        ctx.fillStyle = 'rgba(255, 255, 255, ' + (alpha * 0.95) + ')';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.4, 0, 6.2831853);
-        ctx.fill();
-      }
-    }
-  }
-
-  function addParticle(p) {
+  function spawnEmber(x, y, dx, dy, isIce) {
     if (particles.length >= MAX_PARTICLES) {
       particles.shift();
     }
-    particles.push(p);
+
+    // 1.5 to 3.0 seconds duration
+    const lifeDuration = 1.5 + Math.random() * 1.5;
+    
+    if (isIce) {
+      // Annihilation particles (Matter + Antimatter clash)
+      const color = (Math.random() > 0.5) 
+        ? FIRE_COLORS[Math.floor(Math.random() * FIRE_COLORS.length)]
+        : ICE_COLORS[Math.floor(Math.random() * ICE_COLORS.length)];
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 2.2 + 0.8;
+      const size = Math.random() * 2.2 + 1.2;
+      particles.push(new FireEmber(
+        x + (Math.random() - 0.5) * 4,
+        y + (Math.random() - 0.5) * 4,
+        Math.cos(angle) * speed,
+        Math.sin(angle) * speed - 0.5,
+        size,
+        color,
+        lifeDuration * 0.8,
+        true
+      ));
+    } else {
+      // Normal Fiery Embers
+      const color = FIRE_COLORS[Math.floor(Math.random() * FIRE_COLORS.length)];
+      const vx = (Math.random() - 0.5) * 1.2 + dx * 0.05;
+      const vy = (Math.random() - 0.5) * 1.2 + dy * 0.05 - (0.6 + Math.random() * 1.2); // Upward flame drift
+      const size = Math.random() * 2.6 + 1.2; // 1.2px - 3.8px fine embers
+      particles.push(new FireEmber(
+        x + (Math.random() - 0.5) * 4,
+        y + (Math.random() - 0.5) * 4,
+        vx,
+        vy,
+        size,
+        color,
+        lifeDuration,
+        false
+      ));
+    }
   }
 
-  let lastMoveTime = 0;
+  function handlePointer(clientX, clientY) {
+    if (clientX === undefined || clientY === undefined) return;
 
-  function onPointerMove(e) {
-    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : mouseX);
-    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : mouseY);
-    if (x === undefined || y === undefined) return;
-
-    mouseX = x;
-    mouseY = y;
+    mouseX = clientX;
+    mouseY = clientY;
 
     if (lastX === -100) {
       lastX = mouseX;
       lastY = mouseY;
+      return;
     }
 
-    const now = performance.now();
-    const dt = now - lastMoveTime;
     const dx = mouseX - lastX;
     const dy = mouseY - lastY;
-    const distSq = dx * dx + dy * dy;
+    const dist = Math.hypot(dx, dy);
 
-    // Minimum movement threshold for ultra-clean response
-    if (distSq > 9 && dt > 10) {
-      lastMoveTime = now;
-      const dist = Math.sqrt(distSq);
-      const count = isOverIce ? 3 : 2;
-
-      for (let i = 0; i < count; i++) {
-        const t = (i + 1) / count;
-        const px = lastX + dx * t + (Math.random() - 0.5) * 3;
-        const py = lastY + dy * t + (Math.random() - 0.5) * 3;
-
-        if (isOverIce) {
-          // Annihilation sparks on Ice buttons
-          const col = Math.random() > 0.5 
-            ? FIRE_COLORS[Math.floor(Math.random() * FIRE_COLORS.length)]
-            : ICE_COLORS[Math.floor(Math.random() * ICE_COLORS.length)];
-          const angle = Math.random() * 6.2831853;
-          const spd = Math.random() * 3.2 + 1.5;
-          addParticle(new Spark(px, py, Math.cos(angle) * spd, Math.sin(angle) * spd - 1, Math.random() * 2.2 + 1.2, col, true));
-        } else {
-          // Normal Fire Embers (Snappy, fast and delicate)
-          const col = FIRE_COLORS[Math.floor(Math.random() * FIRE_COLORS.length)];
-          const vx = (Math.random() - 0.5) * 1.8 + dx * 0.08;
-          const vy = (Math.random() - 0.5) * 1.8 + dy * 0.08 - (1.0 + Math.random() * 1.5);
-          addParticle(new Spark(px, py, vx, vy, Math.random() * 2.5 + 1.2, col, false));
-        }
+    // If mouse moved, spawn embers along the trail smoothly
+    if (dist > 1.5) {
+      const steps = Math.min(6, Math.max(1, Math.floor(dist / 6)));
+      for (let i = 0; i < steps; i++) {
+        const t = (i + 1) / steps;
+        const px = lastX + dx * t;
+        const py = lastY + dy * t;
+        spawnEmber(px, py, dx, dy, isOverIce);
       }
-
       lastX = mouseX;
       lastY = mouseY;
     }
 
     if (!animId) {
-      animId = requestAnimationFrame(loop);
+      animId = requestAnimationFrame(animate);
     }
   }
 
-  window.addEventListener('mousemove', onPointerMove, { passive: true });
-  window.addEventListener('touchmove', onPointerMove, { passive: true });
+  // Listen to mouse movement and touch drags
+  window.addEventListener('mousemove', (e) => {
+    handlePointer(e.clientX, e.clientY);
+  }, { passive: true });
 
-  // Quick energetic click burst
-  function onPointerDown(e) {
-    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : mouseX);
-    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : mouseY);
-    if (x === undefined || y === undefined) return;
-
-    const count = isOverIce ? 16 : 10;
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * 6.2831853;
-      const speed = Math.random() * 4.5 + 2;
-      const col = isOverIce && Math.random() > 0.5
-        ? ICE_COLORS[Math.floor(Math.random() * ICE_COLORS.length)]
-        : FIRE_COLORS[Math.floor(Math.random() * FIRE_COLORS.length)];
-      addParticle(new Spark(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed - 1.2, Math.random() * 2.5 + 1.2, col, isOverIce));
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches && e.touches[0]) {
+      handlePointer(e.touches[0].clientX, e.touches[0].clientY);
     }
+  }, { passive: true });
 
-    if (!animId) {
-      animId = requestAnimationFrame(loop);
-    }
-  }
+  // Reset pointer anchor on leave
+  window.addEventListener('mouseleave', () => {
+    lastX = -100;
+    lastY = -100;
+  }, { passive: true });
 
-  window.addEventListener('mousedown', onPointerDown, { passive: true });
-  window.addEventListener('touchstart', onPointerDown, { passive: true });
-
-  function loop() {
+  function animate() {
+    frameCount++;
     ctx.clearRect(0, 0, width, height);
     ctx.globalCompositeOperation = 'lighter';
 
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
-      p.update();
-      p.draw(ctx);
-      if (p.life <= 0 || p.size < 0.3) {
+      p.update(frameCount);
+      p.draw(ctx, frameCount);
+      if (p.life <= 0 || p.size <= 0.1) {
         particles.splice(i, 1);
       }
     }
 
     if (particles.length > 0) {
-      animId = requestAnimationFrame(loop);
+      animId = requestAnimationFrame(animate);
     } else {
       animId = null;
-      lastX = -100;
-      lastY = -100;
     }
   }
 })();
