@@ -1,24 +1,25 @@
 /**
- * Continuous Split Fire & Ice Mouse Trail Engine
- * - Left half of screen (x < width / 2): Emits Ice Fire (Cyan / Frost / Glacial embers)
- * - Right half of screen (x >= width / 2): Emits Normal Fire (Gold / Orange / Crimson embers)
- * - Center boundary / Ice buttons: Triggers Matter & Antimatter annihilation sizzle
+ * Split Fire & Ice Mouse Trail Engine
+ * - Left Half of Screen: Electric Ice Fire (Vivid Cyan, Glacial Blue, Frost Sparks)
+ * - Right Half of Screen: Radiant Normal Fire (Flame Orange, Molten Gold, Burning Crimson)
  * - 1.5 to 3.0s lingering buoyant ember lifespan
  */
 (() => {
   const canvas = document.createElement('canvas');
   canvas.id = 'fire-cursor-canvas';
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;transform:translateZ(0);';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999999;transform:translateZ(0);';
   document.body.appendChild(canvas);
 
   const ctx = canvas.getContext('2d', { alpha: true });
   let width = (canvas.width = window.innerWidth);
   let height = (canvas.height = window.innerHeight);
 
-  window.addEventListener('resize', () => {
+  const updateDimensions = () => {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
-  }, { passive: true });
+  };
+
+  window.addEventListener('resize', updateDimensions, { passive: true });
 
   const particles = [];
   const MAX_PARTICLES = 160;
@@ -32,17 +33,17 @@
     { r: 200, g: 25,  b: 0 },   // Smoldering red
   ];
 
-  // Ice Fire Palette (Left side: Antimatter)
+  // Pure Electric Ice Fire Palette (Left side: Antimatter)
   const ICE_COLORS = [
-    { r: 230, g: 250, b: 255 }, // Glacial white-hot core
-    { r: 120, g: 220, b: 255 }, // Crystal cyan
-    { r: 60,  g: 175, b: 255 }, // Vibrant frost blue
-    { r: 20,  g: 120, b: 240 }, // Deep antimatter azure
-    { r: 180, g: 240, b: 255 }, // Cold shimmer
+    { r: 0,   g: 220, b: 255 }, // Vivid electric cyan
+    { r: 79,  g: 185, b: 255 }, // Radiant ice blue
+    { r: 0,   g: 140, b: 255 }, // Deep frost blue
+    { r: 150, g: 235, b: 255 }, // Glacial diamond spark
+    { r: 215, g: 250, b: 255 }, // Icy white
   ];
 
   class FireEmber {
-    constructor(x, y, vx, vy, size, color, maxLifeSeconds = 2.2, isAnnihilation = false) {
+    constructor(x, y, vx, vy, size, color, isIce, maxLifeSeconds = 2.2) {
       this.x = x;
       this.y = y;
       this.vx = vx;
@@ -50,7 +51,7 @@
       this.initSize = size;
       this.size = size;
       this.color = color;
-      this.isAnnihilation = isAnnihilation;
+      this.isIce = isIce;
 
       const totalFrames = maxLifeSeconds * 60;
       this.life = 1.0;
@@ -79,14 +80,16 @@
       const flicker = 0.85 + Math.sin(frame * this.flickerSpeed + this.flickerOffset) * 0.15;
       const alpha = Math.max(0, this.life * flicker);
 
-      ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha * 0.9})`;
+      ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha * 0.95})`;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
 
       // Sharp white-hot center
       if (this.size > 1.2 && alpha > 0.3) {
-        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
+        ctx.fillStyle = this.isIce 
+          ? `rgba(220, 250, 255, ${alpha * 0.9})` 
+          : `rgba(255, 255, 255, ${alpha * 0.9})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size * 0.45, 0, Math.PI * 2);
         ctx.fill();
@@ -114,16 +117,19 @@
     }
 
     const lifeDuration = 1.5 + Math.random() * 1.5;
-    const isLeftHalf = x < (width / 2);
+    // Strict Left vs Right boundary check against real viewport width
+    const screenMid = window.innerWidth / 2;
+    const isLeftHalf = x < screenMid;
 
     if (isOverIce) {
-      // Annihilation reaction (dual elements colliding)
-      const color = Math.random() > 0.5
+      // Annihilation reaction (dual colliding elements)
+      const isFire = Math.random() > 0.5;
+      const color = isFire
         ? FIRE_COLORS[Math.floor(Math.random() * FIRE_COLORS.length)]
         : ICE_COLORS[Math.floor(Math.random() * ICE_COLORS.length)];
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 2.2 + 0.8;
-      const size = Math.random() * 2.2 + 1.2;
+      const size = Math.random() * 2.4 + 1.2;
       particles.push(new FireEmber(
         x + (Math.random() - 0.5) * 4,
         y + (Math.random() - 0.5) * 4,
@@ -131,15 +137,15 @@
         Math.sin(angle) * speed - 0.5,
         size,
         color,
-        lifeDuration * 0.8,
-        true
+        !isFire,
+        lifeDuration * 0.8
       ));
     } else if (isLeftHalf) {
-      // Left side: Ice Fire (Antimatter)
+      // LEFT HALF = ELECTRIC ICE FIRE (Antimatter)
       const color = ICE_COLORS[Math.floor(Math.random() * ICE_COLORS.length)];
       const vx = (Math.random() - 0.5) * 1.2 + dx * 0.05;
       const vy = (Math.random() - 0.5) * 1.2 + dy * 0.05 - (0.6 + Math.random() * 1.2);
-      const size = Math.random() * 2.6 + 1.2;
+      const size = Math.random() * 2.8 + 1.2;
       particles.push(new FireEmber(
         x + (Math.random() - 0.5) * 4,
         y + (Math.random() - 0.5) * 4,
@@ -147,15 +153,15 @@
         vy,
         size,
         color,
-        lifeDuration,
-        false
+        true, // isIce
+        lifeDuration
       ));
     } else {
-      // Right side: Normal Fire (Matter)
+      // RIGHT HALF = RADIANT NORMAL FIRE (Matter)
       const color = FIRE_COLORS[Math.floor(Math.random() * FIRE_COLORS.length)];
       const vx = (Math.random() - 0.5) * 1.2 + dx * 0.05;
       const vy = (Math.random() - 0.5) * 1.2 + dy * 0.05 - (0.6 + Math.random() * 1.2);
-      const size = Math.random() * 2.6 + 1.2;
+      const size = Math.random() * 2.8 + 1.2;
       particles.push(new FireEmber(
         x + (Math.random() - 0.5) * 4,
         y + (Math.random() - 0.5) * 4,
@@ -163,8 +169,8 @@
         vy,
         size,
         color,
-        lifeDuration,
-        false
+        false, // isIce
+        lifeDuration
       ));
     }
   }
