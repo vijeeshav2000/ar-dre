@@ -223,47 +223,37 @@
     margin-top: 6px;
   }
 
-  /* Glacial Ice Throne Button */
+  /* Action Button: Rectangular Pill with Dual Border */
   .throne-btn {
     display: inline-block;
-    padding: 16px 38px;
-    border: 1.5px solid rgba(160, 225, 255, 0.7);
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(160, 230, 255, 0.2) 0%, rgba(30, 95, 165, 0.35) 50%, rgba(8, 24, 48, 0.8) 100%);
-    color: #e2f4ff;
+    padding: 15px 38px;
+    border-radius: 12px;
+    background: rgba(6, 10, 16, 0.75);
+    color: #d4d8dc;
     font-family: 'Trajan', 'Cinzel', serif;
     font-size: clamp(12px, 2.5vw, 14px);
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     margin-bottom: 28px;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 0 20px rgba(79, 179, 255, 0.35), inset 0 0 12px rgba(180, 235, 255, 0.25);
-    text-shadow: 0 0 10px rgba(140, 215, 255, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+    border: 1px solid transparent;
+    background-image: linear-gradient(rgba(6, 10, 16, 0.8), rgba(6, 10, 16, 0.8)), 
+                      linear-gradient(to right, rgba(126, 194, 235, 0.6), rgba(232, 120, 52, 0.6));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
     position: relative;
     overflow: hidden;
-    transform: translateZ(0);
-  }
-  .throne-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.6s ease;
   }
   .throne-btn:hover:not(:disabled) {
-    border-color: #ffffff;
     color: #ffffff;
-    background: linear-gradient(135deg, rgba(255, 120, 50, 0.25) 0%, rgba(79, 179, 255, 0.45) 50%, rgba(15, 40, 75, 0.85) 100%);
-    box-shadow: 0 0 35px rgba(79, 179, 255, 0.8), 0 0 25px rgba(255, 69, 32, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.5);
     transform: scale(1.03);
-    text-shadow: 0 0 14px #ffffff, 0 0 25px rgba(79, 179, 255, 0.9);
-  }
-  .throne-btn:hover:not(:disabled)::before {
-    transform: translateX(100%);
+    box-shadow: 0 0 25px rgba(126, 194, 235, 0.5), 0 0 25px rgba(232, 120, 52, 0.5);
+    background-image: linear-gradient(rgba(12, 18, 28, 0.9), rgba(12, 18, 28, 0.9)), 
+                      linear-gradient(to right, rgba(126, 194, 235, 0.95), rgba(232, 120, 52, 0.95));
   }
   .throne-btn:active:not(:disabled) {
     transform: scale(0.97);
@@ -271,7 +261,6 @@
   .throne-btn:disabled {
     opacity: 0.35;
     cursor: not-allowed;
-    border-color: rgba(160, 225, 255, 0.2);
     box-shadow: none;
   }
 
@@ -355,10 +344,9 @@
     align-items: center;
     gap: 6px;
     padding: 10px 22px;
-    border: 1.5px solid rgba(160, 225, 255, 0.6);
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(160, 230, 255, 0.18) 0%, rgba(30, 95, 165, 0.3) 50%, rgba(8, 24, 48, 0.7) 100%);
-    color: #e2f4ff;
+    border-radius: 12px;
+    background: rgba(6, 10, 16, 0.75);
+    color: #d4d8dc;
     font-family: 'Trajan', 'Cinzel', serif;
     font-size: 11px;
     font-weight: 700;
@@ -366,18 +354,19 @@
     text-transform: uppercase;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    backdrop-filter: blur(14px);
-    box-shadow: 0 0 18px rgba(79, 179, 255, 0.3), inset 0 0 12px rgba(180, 235, 255, 0.2);
-    text-shadow: 0 0 8px rgba(140, 215, 255, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    border: 1px solid transparent;
+    background-image: linear-gradient(rgba(6, 10, 16, 0.8), rgba(6, 10, 16, 0.8)), 
+                      linear-gradient(to right, rgba(126, 194, 235, 0.6), rgba(232, 120, 52, 0.6));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
     z-index: 50;
   }
   .home-btn:hover {
-    border-color: #ffffff;
     color: #ffffff;
-    background: linear-gradient(135deg, rgba(255, 120, 50, 0.25) 0%, rgba(79, 179, 255, 0.45) 50%, rgba(15, 40, 75, 0.85) 100%);
-    box-shadow: 0 0 30px rgba(79, 179, 255, 0.8), 0 0 20px rgba(255, 69, 32, 0.6);
-    transform: scale(1.06);
-    text-shadow: 0 0 12px #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(126, 194, 235, 0.4), 0 0 20px rgba(232, 120, 52, 0.4);
   }
 
   /* Connection Status */
@@ -399,17 +388,17 @@
 </head>
 <body>
 
-<a href="../" class="home-btn">&larr; H<span class="o-char">O</span>ME</a>
+<a href="../" class="home-btn">&larr; HOME</a>
 
 <canvas id="fx-canvas"></canvas>
 <div id="flash-overlay"></div>
 
 <div class="container" id="main-container">
   <h1 class="got-title">
-    A S<span class="o-char">O</span>NG <span class="o-char">O</span>F<br>
-    ICE AND FIRE
+    <span style="font-size:0.62em;letter-spacing:5px;display:block;margin-bottom:4px;"><span style="color:#7ec2eb">A SONG</span> <span style="color:#e87834">OF</span></span>
+    <span style="color:#7ec2eb">ICE</span> <span style="color:#d4d8dc">AND</span> <span style="color:#e87834">FIRE</span>
   </h1>
-  <div class="subtitle">MATTER VS ANTIMATTER &middot; REALM BATTLE TRACKER</div>
+  <div class="subtitle"><span style="color:#7ec2eb">ANTIMATTER</span> <span style="color:#8c94a0">VS</span> <span style="color:#e87834">MATTER</span> &middot; <span style="color:#8c94a0">REALM BATTLE TRACKER</span></div>
 
   <div class="scores">
     <div class="score-card ice" id="ice-card">
