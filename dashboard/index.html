@@ -698,16 +698,17 @@ const audioController = new GotAudioController()
   })
 
   // --- WebSocket Live Connection ---
-  const WORKER_HOST = 'got-ar-backend.dr-e-backend.workers.dev'
+  const WORKER_HOST = 'score-relay.iceandfire.workers.dev'
+  const ROOM_ID = 'quantum1'
   let ws = null
   let reconnectTimer = null
 
   function connectWS() {
     try {
-      ws = new WebSocket('wss://' + WORKER_HOST + '/ws?role=dashboard')
+      ws = new WebSocket('wss://' + WORKER_HOST + '/ws?room=' + encodeURIComponent(ROOM_ID) + '&name=dashboard&role=viewer')
 
       ws.onopen = () => {
-        statusEl.textContent = 'REALM LIVE &middot; TRACKING SCORES'
+        statusEl.textContent = 'REALM LIVE \u00B7 TRACKING SCORES'
         statusEl.classList.add('connected')
         if (reconnectTimer) clearTimeout(reconnectTimer)
       }
@@ -715,15 +716,14 @@ const audioController = new GotAudioController()
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data)
-          if (msg.type === 'state' && msg.data) {
+          if (msg.type === 'state') {
+            const scoresObj = msg.scores || (msg.data && msg.data.scores) || {}
             let totalIce = 0
             let totalFire = 0
-            if (msg.data.scores) {
-              Object.values(msg.data.scores).forEach(s => {
-                totalIce += (s.ice || 0)
-                totalFire += (s.fire || 0)
-              })
-            }
+            Object.values(scoresObj).forEach(s => {
+              totalIce += (s.ice || 0)
+              totalFire += (s.fire || 0)
+            })
             updateScores(totalIce, totalFire)
           }
         } catch(e) {}
@@ -747,22 +747,21 @@ const audioController = new GotAudioController()
   // Fallback Polling
   async function pollState() {
     try {
-      const res = await fetch('https://' + WORKER_HOST + '/state')
+      const res = await fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID))
       if (res.ok) {
         const data = await res.json()
-        if (data && data.scores) {
-          let totalIce = 0
-          let totalFire = 0
-          Object.values(data.scores).forEach(s => {
-            totalIce += (s.ice || 0)
-            totalFire += (s.fire || 0)
-          })
-          updateScores(totalIce, totalFire)
-        }
+        const scoresObj = data.scores || (data.data && data.data.scores) || {}
+        let totalIce = 0
+        let totalFire = 0
+        Object.values(scoresObj).forEach(s => {
+          totalIce += (s.ice || 0)
+          totalFire += (s.fire || 0)
+        })
+        updateScores(totalIce, totalFire)
       }
     } catch(e) {}
   }
-  setInterval(pollState, 1000)
+  setInterval(pollState, 1500)
   pollState()
 })()
 </script>
