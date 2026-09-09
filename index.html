@@ -41,15 +41,19 @@
     user-select: none;
   }
 
-  /* Atmospheric Background Backdrop matching the reference screenshots */
+  /* Atmospheric Mountain Landscape Background */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background:
-      radial-gradient(ellipse at 15% 25%, rgba(40, 110, 185, 0.15) 0%, transparent 55%),
-      radial-gradient(ellipse at 85% 25%, rgba(185, 80, 25, 0.15) 0%, transparent 55%),
-      linear-gradient(to bottom, #020406 0%, #06090f 45%, #030508 100%);
+    background-image: 
+      radial-gradient(ellipse at 15% 25%, rgba(30, 95, 170, 0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 25%, rgba(185, 75, 20, 0.22) 0%, transparent 55%),
+      linear-gradient(to bottom, rgba(2, 4, 6, 0.6) 0%, rgba(5, 8, 14, 0.4) 40%, rgba(2, 4, 6, 0.75) 100%),
+      url('assets/mountain_bg.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
     pointer-events: none;
     z-index: 0;
   }
@@ -88,23 +92,41 @@
     z-index: 2;
   }
 
-  /* Dual Color Text Classes */
-  .c-ice {
-    color: var(--ice-text);
-    text-shadow: 0 0 16px rgba(126, 194, 235, 0.3);
+  /* Luminous Text Gradient Classes */
+  .grad-ice {
+    background: linear-gradient(180deg, #e4f5ff 0%, #7ec2eb 70%, #4da2d6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 14px rgba(126, 194, 235, 0.35));
+    display: inline-block;
   }
-  .c-fire {
-    color: var(--fire-text);
-    text-shadow: 0 0 16px rgba(232, 120, 52, 0.3);
+
+  .grad-fire {
+    background: linear-gradient(180deg, #ffeed6 0%, #e87834 70%, #c45415 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 14px rgba(232, 120, 52, 0.35));
+    display: inline-block;
   }
-  .c-silver {
-    color: var(--silver-text);
+
+  .grad-silver {
+    background: linear-gradient(180deg, #ffffff 0%, #d4d8dc 70%, #9ca4ac 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+  }
+
+  .grad-dual-line {
+    background: linear-gradient(to right, #7ec2eb 0%, #a2dcfc 45%, #ffb066 55%, #e87834 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.15));
   }
 
   /* Screen 1 Title Typography */
   .title-intro {
     font-family: 'Trajan', 'Cinzel', serif;
-    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    font-size: clamp(1.8rem, 5.2vw, 3.3rem);
     letter-spacing: 5px;
     line-height: 1.35;
     margin-bottom: 28px;
@@ -117,7 +139,7 @@
     display: block;
   }
 
-  /* Screen 2 Scan Title Typography */
+  /* Scan Title Typography */
   .title-scan {
     font-family: 'Trajan', 'Cinzel', serif;
     font-size: clamp(1.4rem, 3.5vw, 2.2rem);
@@ -127,13 +149,13 @@
     text-transform: uppercase;
   }
 
-  /* Center Lore Text (Screen 3 & 4) */
+  /* Center Lore Text */
   .lore-text-block {
     font-family: 'Trajan', 'Cinzel', serif;
     font-size: clamp(1.05rem, 2.3vw, 1.45rem);
     line-height: 2.1;
     letter-spacing: 3px;
-    max-width: 820px;
+    max-width: 840px;
     text-align: center;
     margin-bottom: 36px;
     text-transform: uppercase;
@@ -142,7 +164,7 @@
     padding: 0 15px;
   }
 
-  /* Reference Action Button: Rectangular Pill with Dual Border */
+  /* Action Buttons: Rectangular Pill with Dual Gradient Border */
   .got-action-btn {
     display: inline-flex;
     align-items: center;
@@ -160,11 +182,11 @@
     position: relative;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.85);
     z-index: 10;
     border: 1px solid transparent;
     background-image: linear-gradient(rgba(6, 10, 16, 0.8), rgba(6, 10, 16, 0.8)), 
-                      linear-gradient(to right, rgba(126, 194, 235, 0.6), rgba(232, 120, 52, 0.6));
+                      linear-gradient(to right, rgba(126, 194, 235, 0.65), rgba(232, 120, 52, 0.65));
     background-origin: border-box;
     background-clip: padding-box, border-box;
   }
@@ -172,9 +194,9 @@
   .got-action-btn:hover {
     color: #ffffff;
     transform: scale(1.04);
-    box-shadow: 0 0 25px rgba(126, 194, 235, 0.4), 0 0 25px rgba(232, 120, 52, 0.4);
+    box-shadow: 0 0 25px rgba(126, 194, 235, 0.45), 0 0 25px rgba(232, 120, 52, 0.45);
     background-image: linear-gradient(rgba(12, 18, 28, 0.9), rgba(12, 18, 28, 0.9)), 
-                      linear-gradient(to right, rgba(126, 194, 235, 0.9), rgba(232, 120, 52, 0.9));
+                      linear-gradient(to right, rgba(126, 194, 235, 0.95), rgba(232, 120, 52, 0.95));
   }
 
   .got-action-btn:active {
@@ -196,7 +218,7 @@
     to { transform: rotate(360deg); }
   }
 
-  /* Screen 2 & 4 Side Floating Flames */
+  /* Side Floating Flames */
   .side-flames-row {
     display: flex;
     align-items: center;
@@ -229,7 +251,7 @@
     to { transform: translateY(-10px); }
   }
 
-  /* Screen 2 QR Code Box */
+  /* QR Code Box */
   .qr-center-box {
     background: #ffffff;
     padding: 10px;
@@ -247,7 +269,7 @@
     object-fit: contain;
   }
 
-  /* Screen 3 & 5 Character Dragon Portraits */
+  /* Character Dragon Portraits */
   .char-portrait-left, .char-portrait-right {
     position: absolute;
     bottom: 0;
@@ -268,7 +290,7 @@
     -webkit-mask-image: linear-gradient(to left, black 60%, transparent 100%);
   }
 
-  /* Screen 5 Central Rules Card */
+  /* Central Rules Card */
   .rules-frosted-card {
     background: rgba(6, 10, 16, 0.7);
     border-radius: 14px;
@@ -328,8 +350,8 @@
   <!-- SCREEN 1: TITLE SCREEN (A SONG OF ICE AND FIRE) -->
   <div class="slide active" id="slide-1">
     <h1 class="title-intro">
-      <span class="sub-line"><span class="c-ice">A SONG</span> <span class="c-fire">OF</span></span>
-      <span class="c-ice">ICE</span> <span class="c-silver">AND</span> <span class="c-fire">FIRE</span>
+      <span class="sub-line"><span class="grad-ice">A SONG</span> <span class="grad-fire">OF</span></span>
+      <span class="grad-ice">ICE</span> <span class="grad-silver">AND</span> <span class="grad-fire">FIRE</span>
     </h1>
 
     <img src="assets/yinyang.png" alt="A Song of Ice and Fire Emblem" class="yin-yang-emblem">
@@ -337,11 +359,72 @@
     <button class="got-action-btn" onclick="goToSlide(2)">START</button>
   </div>
 
-  <!-- SCREEN 2: SCAN TO PLAY -->
+  <!-- SCREEN 2: LORE & FORCES -->
   <div class="slide" id="slide-2">
+    <img src="assets/nightking_dragon.png" alt="Night King & Viserion" class="char-portrait-left">
+    <img src="assets/daenerys_dragon.png" alt="Daenerys & Drogon" class="char-portrait-right">
+
+    <div class="lore-text-block">
+      <span class="grad-ice">A SONG OF ICE AND</span> <span class="grad-fire">FIRE. TWO</span><br>
+      <span class="grad-ice">FORCES, ANCIENT AND</span> <span class="grad-fire">OPPOSED &mdash;</span><br>
+      <span class="grad-ice">ONE OF CREATION,</span> <span class="grad-fire">ONE OF ENDING.</span><br>
+      <span class="grad-ice">WHERE THEY MEET,</span> <span class="grad-fire">WORLDS ARE</span><br>
+      <span class="grad-fire">DECIDED.</span>
+    </div>
+
+    <button class="got-action-btn" onclick="goToSlide(3)">CONTINUE</button>
+  </div>
+
+  <!-- SCREEN 3: PHYSICS & COSMOLOGY -->
+  <div class="slide" id="slide-3">
+    <div class="side-flames-row" style="margin-bottom: 0; justify-content: space-between; max-width: 960px;">
+      <img src="assets/ice_flame.png" alt="Ice Flame" class="flame-icon-left">
+
+      <div class="lore-text-block" style="margin-bottom: 0;">
+        <span class="grad-ice">THIS ISN'T ONLY A STORY. IN</span> <span class="grad-fire">PHYSICS, EVERY</span><br>
+        <span class="grad-ice">PARTICLE OF MATTER HAS A</span> <span class="grad-fire">MIRROR</span><br>
+        <span class="grad-ice">OPPOSITE &mdash;</span> <span class="grad-fire">ANTIMATTER. AND WHEN THEY</span><br>
+        <span class="grad-ice">MEET, LIKE ICE AND FIRE,</span> <span class="grad-fire">NEITHER SURVIVES.</span><br>
+        <span class="grad-ice">THE UNIVERSE SHOULD HAVE</span> <span class="grad-fire">CANCELLED</span><br>
+        <span class="grad-ice">ITSELF INTO NOTHING.</span> <span class="grad-fire">IT DIDN'T.</span><br>
+        <span class="grad-fire">THIS IS WHAT REMAINED.</span>
+      </div>
+
+      <img src="assets/fire_flame.png" alt="Fire Flame" class="flame-icon-right">
+    </div>
+
+    <div style="margin-top: 32px; position: relative; z-index: 10;">
+      <button class="got-action-btn" onclick="goToSlide(4)">CONTINUE</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: GAME RULES & CLAIM THE THRONE -->
+  <div class="slide" id="slide-4">
+    <img src="assets/nightking_dragon.png" alt="Night King & Viserion" class="char-portrait-left">
+    <img src="assets/daenerys_dragon.png" alt="Daenerys & Drogon" class="char-portrait-right">
+
+    <div class="rules-frosted-card">
+      <div class="rules-line">
+        <span class="grad-ice">TWO PLAYERS.</span> <span class="grad-fire">TWO SIDES.</span>
+      </div>
+      <div class="rules-line" style="margin-top: 14px;">
+        <span class="grad-silver">CHOOSE YOUR ALLEGIANCE -</span><br>
+        <span class="grad-ice">ICE</span> <span class="grad-silver">OR</span> <span class="grad-fire">FIRE</span>
+      </div>
+      <div class="rules-line" style="margin-top: 14px;">
+        <span class="grad-ice">30 SECONDS TO COLLECT</span> <span class="grad-fire">EMBERS</span><br>
+        <span class="grad-ice">AND CLAIM</span> <span class="grad-fire">THE THRONE</span>
+      </div>
+    </div>
+
+    <button class="got-action-btn" onclick="goToSlide(5)">CONTINUE</button>
+  </div>
+
+  <!-- SCREEN 5: SCAN TO PLAY & TO DASHBOARD -->
+  <div class="slide" id="slide-5">
     <h2 class="title-scan">
-      <span class="c-ice">SCAN THIS QR</span> <span class="c-fire">CODE</span><br>
-      <span class="c-ice">TO PLAY</span>
+      <span class="grad-ice">SCAN THIS QR</span> <span class="grad-fire">CODE</span><br>
+      <span class="grad-ice">TO PLAY</span>
     </h2>
 
     <div class="side-flames-row">
@@ -352,68 +435,10 @@
       <img src="assets/fire_flame.png" alt="Fire Flame" class="flame-icon-right">
     </div>
 
-    <button class="got-action-btn" onclick="goToSlide(3)">RULES OF THE GAME</button>
-  </div>
-
-  <!-- SCREEN 3: LORE & FORCES -->
-  <div class="slide" id="slide-3">
-    <img src="assets/nightking_dragon.png" alt="Night King & Viserion" class="char-portrait-left">
-    <img src="assets/daenerys_dragon.png" alt="Daenerys & Drogon" class="char-portrait-right">
-
-    <div class="lore-text-block">
-      <span class="c-ice">A SONG OF ICE AND</span> <span class="c-fire">FIRE. TWO</span><br>
-      <span class="c-ice">FORCES, ANCIENT AND</span> <span class="c-fire">OPPOSED &mdash;</span><br>
-      <span class="c-ice">ONE OF CREATION,</span> <span class="c-fire">ONE OF ENDING.</span><br>
-      <span class="c-ice">WHERE THEY MEET,</span> <span class="c-fire">WORLDS ARE</span><br>
-      <span class="c-fire">DECIDED.</span>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 10;">
+      <button class="got-action-btn" onclick="goToSlide(4)">RULES OF THE GAME</button>
+      <a href="./dashboard/" class="got-action-btn" style="background-image: linear-gradient(rgba(12, 18, 28, 0.85), rgba(12, 18, 28, 0.85)), linear-gradient(to right, rgba(126, 194, 235, 0.85), rgba(232, 120, 52, 0.85));">TO DASHBOARD &rarr;</a>
     </div>
-
-    <button class="got-action-btn" onclick="goToSlide(4)">CONTINUE</button>
-  </div>
-
-  <!-- SCREEN 4: PHYSICS & COSMOLOGY -->
-  <div class="slide" id="slide-4">
-    <div class="side-flames-row" style="margin-bottom: 0; justify-content: space-between; max-width: 960px;">
-      <img src="assets/ice_flame.png" alt="Ice Flame" class="flame-icon-left">
-
-      <div class="lore-text-block" style="margin-bottom: 0;">
-        <span class="c-ice">THIS ISN'T ONLY A STORY. IN</span> <span class="c-fire">PHYSICS, EVERY</span><br>
-        <span class="c-ice">PARTICLE OF MATTER HAS A</span> <span class="c-fire">MIRROR</span><br>
-        <span class="c-ice">OPPOSITE &mdash;</span> <span class="c-fire">ANTIMATTER. AND WHEN THEY</span><br>
-        <span class="c-ice">MEET, LIKE ICE AND FIRE,</span> <span class="c-fire">NEITHER SURVIVES.</span><br>
-        <span class="c-ice">THE UNIVERSE SHOULD HAVE</span> <span class="c-fire">CANCELLED</span><br>
-        <span class="c-ice">ITSELF INTO NOTHING.</span> <span class="c-fire">IT DIDN'T.</span><br>
-        <span class="c-fire">THIS IS WHAT REMAINED.</span>
-      </div>
-
-      <img src="assets/fire_flame.png" alt="Fire Flame" class="flame-icon-right">
-    </div>
-
-    <div style="margin-top: 32px; position: relative; z-index: 10;">
-      <button class="got-action-btn" onclick="goToSlide(5)">CONTINUE</button>
-    </div>
-  </div>
-
-  <!-- SCREEN 5: GAME RULES & TO DASHBOARD -->
-  <div class="slide" id="slide-5">
-    <img src="assets/nightking_dragon.png" alt="Night King & Viserion" class="char-portrait-left">
-    <img src="assets/daenerys_dragon.png" alt="Daenerys & Drogon" class="char-portrait-right">
-
-    <div class="rules-frosted-card">
-      <div class="rules-line">
-        <span class="c-ice">TWO PLAYERS.</span> <span class="c-fire">TWO SIDES.</span>
-      </div>
-      <div class="rules-line" style="margin-top: 14px;">
-        <span class="c-silver">CHOOSE YOUR ALLEGIANCE -</span><br>
-        <span class="c-ice">ICE</span> <span class="c-silver">OR</span> <span class="c-fire">FIRE</span>
-      </div>
-      <div class="rules-line" style="margin-top: 14px;">
-        <span class="c-ice">30 SECONDS TO COLLECT</span> <span class="c-fire">EMBERS</span><br>
-        <span class="c-ice">AND CLAIM</span> <span class="c-fire">THE THRONE</span>
-      </div>
-    </div>
-
-    <a href="./dashboard/" class="got-action-btn">TO DASHBOARD</a>
   </div>
 
 </div>
@@ -451,6 +476,6 @@
   });
 </script>
 
-<script src="assets/fire-cursor.js?v=4"></script>
+<script src="assets/fire-cursor.js?v=5"></script>
 </body>
 </html>
