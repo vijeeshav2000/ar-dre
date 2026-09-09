@@ -252,7 +252,7 @@
     object-fit: contain;
   }
 
-  /* Character Dragon Portraits */
+  /* Character Dragon Portraits with Seamless Feather Blending */
   .char-portrait-left, .char-portrait-right {
     position: absolute;
     bottom: 0;
@@ -265,19 +265,13 @@
   }
   .char-portrait-left {
     left: 0;
-    filter: drop-shadow(0 0 35px rgba(79, 179, 255, 0.45));
-    mask-image: linear-gradient(to right, black 50%, transparent 95%),
-                linear-gradient(to bottom, black 80%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 50%, transparent 95%),
-                        linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: radial-gradient(ellipse at 15% 65%, #000000 35%, rgba(0, 0, 0, 0.7) 60%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse at 15% 65%, #000000 35%, rgba(0, 0, 0, 0.7) 60%, transparent 90%);
   }
   .char-portrait-right {
     right: 0;
-    filter: drop-shadow(0 0 35px rgba(255, 69, 32, 0.45));
-    mask-image: linear-gradient(to left, black 50%, transparent 95%),
-                linear-gradient(to bottom, black 80%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to left, black 50%, transparent 95%),
-                        linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: radial-gradient(ellipse at 85% 65%, #000000 35%, rgba(0, 0, 0, 0.7) 60%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse at 85% 65%, #000000 35%, rgba(0, 0, 0, 0.7) 60%, transparent 90%);
   }
 
   /* Screen 6 Central Rules Card */
