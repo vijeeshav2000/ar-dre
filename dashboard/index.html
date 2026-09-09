@@ -13,7 +13,7 @@
 <style>
   @font-face {
     font-family: 'Trajan';
-    src: url('assets/Trajan Regular.ttf?v=10') format('truetype');
+    src: url('assets/Trajan Regular.ttf?v=11') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -24,8 +24,7 @@
     --gold: #d7b97e;
     --ice: #00b4ff;
     --fire: #ff6000;
-    --ice-glow: rgba(0, 180, 255, 0.45);
-    --fire-glow: rgba(255, 96, 0, 0.45);
+    --silver-text: #d4d8dc;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,7 +50,7 @@
       radial-gradient(ellipse at 15% 25%, rgba(30, 95, 170, 0.22) 0%, transparent 55%),
       radial-gradient(ellipse at 85% 25%, rgba(185, 75, 20, 0.22) 0%, transparent 55%),
       linear-gradient(to bottom, rgba(2, 4, 6, 0.5) 0%, rgba(5, 8, 14, 0.35) 40%, rgba(2, 4, 6, 0.75) 100%),
-      url('assets/mountain_bg.jpg?v=10');
+      url('assets/mountain_bg.jpg?v=11');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -110,6 +109,7 @@
     max-width: 680px;
     padding: 30px 20px;
     text-align: center;
+    transition: opacity 0.5s ease;
   }
 
   /* Title Matching Reference Screenshot */
@@ -260,13 +260,13 @@
   }
 
   /* Claim Action Button */
-  .throne-btn {
+  .throne-btn, .outcome-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 14px 44px;
+    padding: 13px 42px;
     border-radius: 12px;
-    background: rgba(6, 10, 16, 0.75);
+    background: rgba(6, 10, 16, 0.85);
     color: var(--silver-text);
     font-family: 'Trajan', 'Cinzel', serif;
     font-size: 14px;
@@ -274,84 +274,73 @@
     letter-spacing: 3.5px;
     text-transform: uppercase;
     cursor: pointer;
+    text-decoration: none;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    margin-bottom: 24px;
     backdrop-filter: blur(10px);
     box-shadow: 0 0 18px rgba(0, 0, 0, 0.85);
     border: 1px solid transparent;
-    background-image: linear-gradient(rgba(6, 10, 16, 0.8), rgba(6, 10, 16, 0.8)), 
+    background-image: linear-gradient(rgba(6, 10, 16, 0.85), rgba(6, 10, 16, 0.85)), 
                       linear-gradient(to right, rgba(126, 194, 235, 0.65), rgba(232, 120, 52, 0.65));
     background-origin: border-box;
     background-clip: padding-box, border-box;
     position: relative;
     overflow: hidden;
   }
-  .throne-btn:hover:not(:disabled) {
+  .throne-btn:hover, .outcome-btn:hover {
     color: #ffffff;
     transform: scale(1.04);
-    box-shadow: 0 0 25px rgba(126, 194, 235, 0.45), 0 0 25px rgba(232, 120, 52, 0.45);
-    background-image: linear-gradient(rgba(12, 18, 28, 0.9), rgba(12, 18, 28, 0.9)), 
+    box-shadow: 0 0 25px rgba(126, 194, 235, 0.5), 0 0 25px rgba(232, 120, 52, 0.5);
+    background-image: linear-gradient(rgba(12, 18, 28, 0.95), rgba(12, 18, 28, 0.95)), 
                       linear-gradient(to right, rgba(126, 194, 235, 0.95), rgba(232, 120, 52, 0.95));
   }
-  .throne-btn:active:not(:disabled) {
+  .throne-btn:active, .outcome-btn:active {
     transform: scale(0.97);
   }
-  .throne-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
 
-  /* Result Reveal */
-  .result {
+  /* Fullscreen Outcome Viewport */
+  #outcome-screen {
+    position: fixed;
+    inset: 0;
     display: none;
-    padding: 28px 20px;
-    border-radius: 16px;
-    background: rgba(6, 10, 16, 0.9);
-    border: 1px solid rgba(215, 185, 126, 0.35);
-    backdrop-filter: blur(14px);
-    position: relative;
-    margin-top: 10px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 200;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 30px 24px;
   }
-  .result.show {
-    display: block;
-    animation: revealDramatic 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes revealDramatic {
-    0% {
-      opacity: 0;
-      transform: translateY(20px) scale(0.9);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  #outcome-screen.active {
+    display: flex;
+    opacity: 1;
   }
 
-  .result .crown {
-    font-size: 50px;
-    margin-bottom: 8px;
-    display: inline-block;
-  }
-
-  .result .winner-title {
+  .outcome-title {
     font-family: 'Trajan', 'Cinzel', serif;
-    font-size: clamp(1.2em, 3.8vw, 1.6em);
-    font-weight: 700;
-    letter-spacing: 3px;
-    margin-bottom: 6px;
-    line-height: 1.3;
-  }
-  .result.ice-wins .winner-title { color: #00b4ff; text-shadow: 0 0 25px var(--ice-glow); }
-  .result.fire-wins .winner-title { color: #ff6000; text-shadow: 0 0 25px var(--fire-glow); }
-  .result.tie .winner-title { color: var(--gold); text-shadow: 0 0 25px rgba(215, 185, 126, 0.5); }
-
-  .result .winner-sub {
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: clamp(2.2rem, 6vw, 4.4rem);
+    letter-spacing: 6px;
+    line-height: 1.25;
+    color: #ffffff;
     text-transform: uppercase;
-    color: #9a8f7a;
+    text-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 255, 255, 0.3);
+    margin-bottom: 32px;
+    max-width: 900px;
+  }
+
+  .outcome-story-text {
+    font-family: 'Trajan', 'Cinzel', serif;
+    font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+    line-height: 2.1;
+    letter-spacing: 3px;
+    color: #f0f4f8;
+    max-width: 860px;
+    text-transform: uppercase;
+    text-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
+    margin-bottom: 36px;
   }
 
   /* Suspense Banner */
@@ -438,7 +427,7 @@
   <div class="dash-columns">
     <!-- PLAYER 1 · ICE COLUMN -->
     <div class="player-column">
-      <img src="assets/ice_flame.png?v=10" alt="Ice Flame" class="column-flame ice">
+      <img src="assets/ice_flame.png?v=11" alt="Ice Flame" class="column-flame ice">
       <div class="score-box ice" id="ice-card">
         <div class="count" id="ice-count">00</div>
         <div class="label">COLLECTED</div>
@@ -451,7 +440,7 @@
 
     <!-- PLAYER 2 · FIRE COLUMN -->
     <div class="player-column">
-      <img src="assets/fire_flame.png?v=10" alt="Fire Flame" class="column-flame fire">
+      <img src="assets/fire_flame.png?v=11" alt="Fire Flame" class="column-flame fire">
       <div class="score-box fire" id="fire-card">
         <div class="count" id="fire-count">00</div>
         <div class="label">COLLECTED</div>
@@ -466,11 +455,18 @@
   <div id="suspense-banner">⚔️ SUMMONING THE IRON THRONE... ⚔️</div>
 
   <button class="throne-btn" id="throne-btn">CLAIM</button>
+</div>
 
-  <div class="result" id="result">
-    <div class="crown" id="result-crown">👑</div>
-    <div class="winner-title" id="winner-text">ICE TAKES THE THRONE</div>
-    <div class="winner-sub" id="winner-sub">PLAYER 1 (ANTIMATTER) VANQUISHES MATTER</div>
+<!-- Fullscreen Outcome Screen Container -->
+<div id="outcome-screen">
+  <div id="outcome-stage-1" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <h1 class="outcome-title" id="outcome-claim-title">ICE CLAIMS<br>THE THRONE</h1>
+    <button class="outcome-btn" id="outcome-see-more-btn">SEE MORE</button>
+  </div>
+
+  <div id="outcome-stage-2" style="display: none; flex-direction: column; align-items: center; justify-content: center;">
+    <p class="outcome-story-text" id="outcome-story-content"></p>
+    <a href="../" class="outcome-btn">HOME</a>
   </div>
 </div>
 
@@ -523,7 +519,7 @@ class FxParticle {
   }
 }
 
-function spawnExplosion(x, y, team, count = 80) {
+function spawnExplosion(x, y, team, count = 100) {
   const colors = team === 'ice'
     ? ['#c8e8ff', '#4fb3ff', '#1e5fa5', '#ffffff', '#8cd7ff']
     : ['#ffeedd', '#ff4520', '#ff8c00', '#ffffff', '#ffd700']
@@ -570,17 +566,21 @@ const audioController = new GotAudioController()
   const iceCard = document.getElementById('ice-card')
   const fireCard = document.getElementById('fire-card')
   const throneBtn = document.getElementById('throne-btn')
-  const resultDiv = document.getElementById('result')
-  const winnerText = document.getElementById('winner-text')
-  const winnerSub = document.getElementById('winner-sub')
-  const resultCrown = document.getElementById('result-crown')
   const statusEl = document.getElementById('status')
   const suspenseBanner = document.getElementById('suspense-banner')
   const flashOverlay = document.getElementById('flash-overlay')
   const mainContainer = document.getElementById('main-container')
 
+  const outcomeScreen = document.getElementById('outcome-screen')
+  const outcomeStage1 = document.getElementById('outcome-stage-1')
+  const outcomeStage2 = document.getElementById('outcome-stage-2')
+  const outcomeClaimTitle = document.getElementById('outcome-claim-title')
+  const outcomeSeeMoreBtn = document.getElementById('outcome-see-more-btn')
+  const outcomeStoryContent = document.getElementById('outcome-story-content')
+
   let currentIce = 0
   let currentFire = 0
+  let currentWinner = 'ice'
 
   const formatDigits = (n) => String(n).padStart(2, '0')
 
@@ -618,37 +618,53 @@ const audioController = new GotAudioController()
 
     audioController.playThroneMusic()
 
-    const winner = currentIce > currentFire ? 'ice' : currentFire > currentIce ? 'fire' : 'tie'
+    currentWinner = currentIce >= currentFire ? 'ice' : 'fire'
     const centerX = window.innerWidth / 2
     const centerY = window.innerHeight / 2
 
-    flashOverlay.className = winner === 'ice' ? 'flash flash-ice' : winner === 'fire' ? 'flash flash-fire' : 'flash'
+    flashOverlay.className = currentWinner === 'ice' ? 'flash flash-ice' : 'flash flash-fire'
     setTimeout(() => { flashOverlay.className = '' }, 800)
 
-    spawnExplosion(centerX, centerY, winner === 'tie' ? 'ice' : winner, 150)
-    if (winner === 'tie') {
-      setTimeout(() => spawnExplosion(centerX, centerY, 'fire', 150), 100)
-    }
+    spawnExplosion(centerX, centerY, currentWinner, 150)
 
     setTimeout(() => {
       suspenseBanner.style.display = 'none'
-      resultDiv.className = 'result show ' + (winner === 'ice' ? 'ice-wins' : winner === 'fire' ? 'fire-wins' : 'tie')
+      mainContainer.style.opacity = '0'
 
-      if (winner === 'ice') {
-        resultCrown.textContent = '❄️👑'
-        winnerText.textContent = 'ICE TAKES THE THRONE'
-        winnerSub.textContent = 'PLAYER 1 (ANTIMATTER) VANQUISHES MATTER'
-      } else if (winner === 'fire') {
-        resultCrown.textContent = '🔥👑'
-        winnerText.textContent = 'FIRE TAKES THE THRONE'
-        winnerSub.textContent = 'PLAYER 2 (MATTER) CONQUERS THE REALM'
+      if (currentWinner === 'ice') {
+        outcomeScreen.style.backgroundImage = "url('assets/outcome_ice_dragon.jpg?v=11')"
+        outcomeClaimTitle.innerHTML = 'ICE CLAIMS<br>THE THRONE'
       } else {
-        resultCrown.textContent = '⚔️👑'
-        winnerText.textContent = 'A REALM IN BALANCE'
-        winnerSub.textContent = 'MATTER & ANTIMATTER MEET IN TOTAL ANNIHILATION'
+        outcomeScreen.style.backgroundImage = "url('assets/outcome_fire_dragon.jpg?v=11')"
+        outcomeClaimTitle.innerHTML = 'FIRE CLAIMS<br>THE THRONE'
       }
-    }, 1200)
+
+      outcomeStage1.style.display = 'flex'
+      outcomeStage2.style.display = 'none'
+      outcomeScreen.classList.add('active')
+    }, 1000)
   }
+
+  outcomeSeeMoreBtn.addEventListener('click', () => {
+    outcomeStage1.style.display = 'none'
+    outcomeStage2.style.display = 'flex'
+
+    if (currentWinner === 'ice') {
+      outcomeScreen.style.backgroundImage = "url('assets/outcome_ice_galaxy.jpg?v=11')"
+      outcomeStoryContent.innerHTML = 
+        "ICE PREVAILED. ANTIMATTER SURVIVED INSTEAD OF<br>" +
+        "MATTER &mdash; A MIRROR UNIVERSE, IDENTICAL IN EVERY<br>" +
+        "LAW, OPPOSITE IN EVERY ATOM. SOMEWHERE IN THE<br>" +
+        "MATHEMATICS, THIS WORLD EXISTS TOO."
+    } else {
+      outcomeScreen.style.backgroundImage = "url('assets/outcome_fire_galaxy.jpg?v=11')"
+      outcomeStoryContent.innerHTML = 
+        "FIRE PREVAILED. MATTER SURVIVED THE COLLISION &mdash;<br>" +
+        "THE SAME IMBALANCE THAT BUILT STARS, PLANETS, AND<br>" +
+        "EVERY LIVING THING. YOU ARE PROOF THAT FIRE WON,<br>" +
+        "ONCE, AT THE BEGINNING OF EVERYTHING."
+    }
+  })
 
   throneBtn.addEventListener('click', () => {
     revealWinner()
@@ -724,6 +740,6 @@ const audioController = new GotAudioController()
 })()
 </script>
 
-<script src="assets/fire-cursor.js?v=10"></script>
+<script src="assets/fire-cursor.js?v=11"></script>
 </body>
 </html>
