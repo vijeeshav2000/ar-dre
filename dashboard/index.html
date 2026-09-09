@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>A Song of Ice and Fire — Live Realm Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,7 +13,7 @@
 <style>
   @font-face {
     font-family: 'Trajan';
-    src: url('assets/Trajan Regular.ttf') format('truetype');
+    src: url('assets/Trajan Regular.ttf?v=10') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -48,7 +51,7 @@
       radial-gradient(ellipse at 15% 25%, rgba(30, 95, 170, 0.22) 0%, transparent 55%),
       radial-gradient(ellipse at 85% 25%, rgba(185, 75, 20, 0.22) 0%, transparent 55%),
       linear-gradient(to bottom, rgba(2, 4, 6, 0.5) 0%, rgba(5, 8, 14, 0.35) 40%, rgba(2, 4, 6, 0.75) 100%),
-      url('assets/mountain_bg.jpg');
+      url('assets/mountain_bg.jpg?v=10');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -368,7 +371,7 @@
     to { opacity: 1; transform: scale(1.02); }
   }
 
-  /* Glacial Ice Home Button */
+  /* Home Button */
   .home-btn {
     position: fixed;
     top: 20px;
@@ -435,7 +438,7 @@
   <div class="dash-columns">
     <!-- PLAYER 1 · ICE COLUMN -->
     <div class="player-column">
-      <img src="assets/ice_flame.png" alt="Ice Flame" class="column-flame ice">
+      <img src="assets/ice_flame.png?v=10" alt="Ice Flame" class="column-flame ice">
       <div class="score-box ice" id="ice-card">
         <div class="count" id="ice-count">00</div>
         <div class="label">COLLECTED</div>
@@ -448,7 +451,7 @@
 
     <!-- PLAYER 2 · FIRE COLUMN -->
     <div class="player-column">
-      <img src="assets/fire_flame.png" alt="Fire Flame" class="column-flame fire">
+      <img src="assets/fire_flame.png?v=10" alt="Fire Flame" class="column-flame fire">
       <div class="score-box fire" id="fire-card">
         <div class="count" id="fire-count">00</div>
         <div class="label">COLLECTED</div>
@@ -462,12 +465,12 @@
 
   <div id="suspense-banner">⚔️ SUMMONING THE IRON THRONE... ⚔️</div>
 
-  <button class="throne-btn" id="throne-btn" disabled>CLAIM</button>
+  <button class="throne-btn" id="throne-btn">CLAIM</button>
 
   <div class="result" id="result">
     <div class="crown" id="result-crown">👑</div>
     <div class="winner-title" id="winner-text">ICE TAKES THE THRONE</div>
-    <div class="winner-sub" id="winner-sub">MATTER REIGNS OVER ANTIMATTER</div>
+    <div class="winner-sub" id="winner-sub">PLAYER 1 (ANTIMATTER) VANQUISHES MATTER</div>
   </div>
 </div>
 
@@ -578,7 +581,6 @@ const audioController = new GotAudioController()
 
   let currentIce = 0
   let currentFire = 0
-  let hasInteracted = false
 
   const formatDigits = (n) => String(n).padStart(2, '0')
 
@@ -586,29 +588,25 @@ const audioController = new GotAudioController()
     if (ice !== currentIce) {
       currentIce = ice
       iceCountEl.textContent = formatDigits(ice)
-      iceCountEl.style.transform = 'scale(1.2)'
+      iceCountEl.style.transform = 'scale(1.15)'
       setTimeout(() => { iceCountEl.style.transform = 'scale(1)' }, 200)
     }
     if (fire !== currentFire) {
       currentFire = fire
       fireCountEl.textContent = formatDigits(fire)
-      fireCountEl.style.transform = 'scale(1.2)'
+      fireCountEl.style.transform = 'scale(1.15)'
       setTimeout(() => { fireCountEl.style.transform = 'scale(1)' }, 200)
     }
 
-    if (currentIce > 0 || currentFire > 0) {
-      throneBtn.removeAttribute('disabled')
-    }
-
     if (currentIce > currentFire) {
-      iceCard.classList.add('active')
-      fireCard.classList.remove('active')
+      iceCard.style.boxShadow = '0 0 35px rgba(0, 180, 255, 0.5)'
+      fireCard.style.boxShadow = '0 0 15px rgba(0, 0, 0, 0.8)'
     } else if (currentFire > currentIce) {
-      fireCard.classList.add('active')
-      iceCard.classList.remove('active')
+      fireCard.style.boxShadow = '0 0 35px rgba(255, 96, 0, 0.5)'
+      iceCard.style.boxShadow = '0 0 15px rgba(0, 0, 0, 0.8)'
     } else {
-      iceCard.classList.remove('active')
-      fireCard.classList.remove('active')
+      iceCard.style.boxShadow = '0 0 20px rgba(0, 180, 255, 0.25)'
+      fireCard.style.boxShadow = '0 0 20px rgba(255, 96, 0, 0.25)'
     }
   }
 
@@ -653,7 +651,6 @@ const audioController = new GotAudioController()
   }
 
   throneBtn.addEventListener('click', () => {
-    hasInteracted = true
     revealWinner()
   })
 
@@ -727,6 +724,6 @@ const audioController = new GotAudioController()
 })()
 </script>
 
-<script src="assets/fire-cursor.js?v=8"></script>
+<script src="assets/fire-cursor.js?v=10"></script>
 </body>
 </html>
