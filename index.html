@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>A Song of Ice and Fire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,14 +13,14 @@
 <style>
   @font-face {
     font-family: 'Trajan';
-    src: url('assets/Trajan Regular.ttf') format('truetype');
+    src: url('assets/Trajan Regular.ttf?v=12') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
   }
 
   :root {
-    --bg-dark: #040609;
+    --bg-dark: #000000;
     --ice-blue: #7ec2eb;
     --fire-orange: #e87834;
     --silver-text: #d4d8dc;
@@ -64,6 +67,7 @@
     transform: scale(0.98);
     padding: 30px 20px;
     z-index: 1;
+    background: #000000;
   }
 
   .slide.active {
@@ -71,6 +75,40 @@
     pointer-events: auto;
     transform: scale(1);
     z-index: 2;
+  }
+
+  /* Top-Left Back Button with Gaps from Left and Top */
+  .top-back-btn {
+    position: fixed;
+    top: 28px;
+    left: 28px;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    border-radius: 12px;
+    background: rgba(6, 10, 16, 0.75);
+    color: #d4d8dc;
+    font-family: 'Trajan', 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background-image: linear-gradient(rgba(6, 10, 16, 0.8), rgba(6, 10, 16, 0.8)), 
+                      linear-gradient(to right, rgba(126, 194, 235, 0.6), rgba(232, 120, 52, 0.6));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 100;
+  }
+  .top-back-btn:hover {
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(126, 194, 235, 0.4), 0 0 20px rgba(232, 120, 52, 0.4);
   }
 
   /* Blue to Orange (Left to Right) Horizontal Gradient Text */
@@ -137,7 +175,7 @@
     justify-content: center;
     padding: 13px 38px;
     border-radius: 12px;
-    background: rgba(6, 10, 16, 0.75);
+    background: #000000;
     color: var(--silver-text);
     font-family: 'Trajan', 'Cinzel', serif;
     font-size: clamp(12px, 1.6vw, 14px);
@@ -147,12 +185,11 @@
     text-decoration: none;
     position: relative;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 18px rgba(0, 0, 0, 0.85);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.9);
     z-index: 10;
     border: 1px solid transparent;
-    background-image: linear-gradient(rgba(6, 10, 16, 0.8), rgba(6, 10, 16, 0.8)), 
-                      linear-gradient(to right, rgba(126, 194, 235, 0.65), rgba(232, 120, 52, 0.65));
+    background-image: linear-gradient(#000000, #000000), 
+                      linear-gradient(to right, rgba(126, 194, 235, 0.7), rgba(232, 120, 52, 0.7));
     background-origin: border-box;
     background-clip: padding-box, border-box;
   }
@@ -160,9 +197,9 @@
   .got-action-btn:hover {
     color: #ffffff;
     transform: scale(1.04);
-    box-shadow: 0 0 25px rgba(126, 194, 235, 0.45), 0 0 25px rgba(232, 120, 52, 0.45);
-    background-image: linear-gradient(rgba(12, 18, 28, 0.9), rgba(12, 18, 28, 0.9)), 
-                      linear-gradient(to right, rgba(126, 194, 235, 0.95), rgba(232, 120, 52, 0.95));
+    box-shadow: 0 0 25px rgba(126, 194, 235, 0.5), 0 0 25px rgba(232, 120, 52, 0.5);
+    background-image: linear-gradient(#050505, #050505), 
+                      linear-gradient(to right, rgba(126, 194, 235, 1), rgba(232, 120, 52, 1));
   }
 
   .got-action-btn:active {
@@ -176,7 +213,7 @@
     margin: 10px auto 40px;
     object-fit: contain;
     mix-blend-mode: screen;
-    filter: drop-shadow(0 0 35px rgba(79, 179, 255, 0.45)) drop-shadow(0 0 35px rgba(255, 69, 32, 0.45));
+    filter: drop-shadow(0 0 35px rgba(79, 179, 255, 0.5)) drop-shadow(0 0 35px rgba(255, 69, 32, 0.5));
     animation: rotateSubtle 40s linear infinite;
   }
   @keyframes rotateSubtle {
@@ -184,7 +221,7 @@
     to { transform: rotate(360deg); }
   }
 
-  /* Side Floating Flames */
+  /* Screen 2 & 4 Side Floating Flames */
   .side-flames-row {
     display: flex;
     align-items: center;
@@ -217,7 +254,7 @@
     to { transform: translateY(-10px); }
   }
 
-  /* QR Code Box */
+  /* Screen 5 QR Code Box */
   .qr-center-box {
     background: #ffffff;
     padding: 10px;
@@ -235,7 +272,7 @@
     object-fit: contain;
   }
 
-  /* Character Dragon Portraits */
+  /* Screen 2 & 6 Character Dragon Portraits */
   .char-portrait-left, .char-portrait-right {
     position: absolute;
     bottom: 0;
@@ -308,6 +345,8 @@
 </head>
 <body>
 
+<button id="top-back-btn" class="top-back-btn" onclick="goBack()">&larr; BACK</button>
+
 <div class="slide-viewport">
 
   <!-- SCREEN 1: TITLE SCREEN -->
@@ -324,8 +363,8 @@
 
   <!-- SCREEN 2: LORE & FORCES -->
   <div class="slide" id="slide-2">
-    <img src="assets/nightking_dragon.png?v=9" alt="Night King & Viserion" class="char-portrait-left">
-    <img src="assets/daenerys_dragon.png?v=9" alt="Daenerys & Drogon" class="char-portrait-right">
+    <img src="assets/nightking_dragon.png?v=12" alt="Night King & Viserion" class="char-portrait-left">
+    <img src="assets/daenerys_dragon.png?v=12" alt="Daenerys & Drogon" class="char-portrait-right">
 
     <div class="lore-text-block">
       <span class="lore-line text-grad-lr">A SONG OF ICE AND FIRE. TWO</span>
@@ -340,7 +379,7 @@
   <!-- SCREEN 3: PHYSICS & COSMOLOGY -->
   <div class="slide" id="slide-3">
     <div class="side-flames-row" style="margin-bottom: 0; justify-content: space-between; max-width: 960px;">
-      <img src="assets/ice_flame.png" alt="Ice Flame" class="flame-icon-left">
+      <img src="assets/ice_flame.png?v=12" alt="Ice Flame" class="flame-icon-left">
 
       <div class="lore-text-block" style="margin-bottom: 0;">
         <span class="lore-line text-grad-lr">THIS ISN'T ONLY A STORY. IN PHYSICS, EVERY</span>
@@ -352,7 +391,7 @@
         <span class="lore-line text-grad-lr">THIS IS WHAT REMAINED.</span>
       </div>
 
-      <img src="assets/fire_flame.png" alt="Fire Flame" class="flame-icon-right">
+      <img src="assets/fire_flame.png?v=12" alt="Fire Flame" class="flame-icon-right">
     </div>
 
     <div style="margin-top: 32px; position: relative; z-index: 10;">
@@ -382,11 +421,11 @@
     </h2>
 
     <div class="side-flames-row">
-      <img src="assets/ice_flame.png" alt="Ice Flame" class="flame-icon-left">
+      <img src="assets/ice_flame.png?v=12" alt="Ice Flame" class="flame-icon-left">
       <div class="qr-center-box">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fvijeeshav2000.github.io%2Far-dre%2Far%2F&color=000000" alt="Scan QR Code to Play">
+        <img src="assets/qr_code.png?v=12" alt="Scan QR Code to Play">
       </div>
-      <img src="assets/fire_flame.png" alt="Fire Flame" class="flame-icon-right">
+      <img src="assets/fire_flame.png?v=12" alt="Fire Flame" class="flame-icon-right">
     </div>
 
     <button class="got-action-btn" onclick="goToSlide(6)">RULES OF THE GAME</button>
@@ -394,8 +433,8 @@
 
   <!-- SCREEN 6: RULES OF THE GAME (TO DASHBOARD) -->
   <div class="slide" id="slide-6">
-    <img src="assets/nightking_dragon.png?v=9" alt="Night King & Viserion" class="char-portrait-left">
-    <img src="assets/daenerys_dragon.png?v=9" alt="Daenerys & Drogon" class="char-portrait-right">
+    <img src="assets/nightking_dragon.png?v=12" alt="Night King & Viserion" class="char-portrait-left">
+    <img src="assets/daenerys_dragon.png?v=12" alt="Daenerys & Drogon" class="char-portrait-right">
 
     <div class="rules-frosted-card">
       <div class="rules-line text-grad-lr">
@@ -433,6 +472,7 @@
 <script>
   let currentSlide = 1;
   const totalSlides = 6;
+  const topBackBtn = document.getElementById('top-back-btn');
 
   const goToSlide = (n) => {
     currentSlide = n;
@@ -442,18 +482,25 @@
     document.querySelectorAll('.dot').forEach((d, idx) => {
       d.classList.toggle('active', idx + 1 === n);
     });
+    topBackBtn.style.display = n > 1 ? 'inline-flex' : 'none';
   };
 
-  // Keyboard navigation support (Arrow Keys / Spacebar / Enter)
+  const goBack = () => {
+    if (currentSlide > 1) {
+      goToSlide(currentSlide - 1);
+    }
+  };
+
+  // Keyboard navigation support (Arrow Keys / Spacebar / Enter / Backspace)
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
       if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
-    } else if (e.key === 'ArrowLeft') {
+    } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
       if (currentSlide > 1) goToSlide(currentSlide - 1);
     }
   });
 </script>
 
-<script src="assets/fire-cursor.js?v=7"></script>
+<script src="assets/fire-cursor.js?v=12"></script>
 </body>
 </html>
