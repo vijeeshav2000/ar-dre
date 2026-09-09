@@ -618,14 +618,24 @@ const audioController = new GotAudioController()
 
     audioController.playThroneMusic()
 
-    currentWinner = currentIce >= currentFire ? 'ice' : 'fire'
+    if (currentIce > currentFire) {
+      currentWinner = 'ice'
+    } else if (currentFire > currentIce) {
+      currentWinner = 'fire'
+    } else {
+      currentWinner = 'tie'
+    }
+
     const centerX = window.innerWidth / 2
     const centerY = window.innerHeight / 2
 
-    flashOverlay.className = currentWinner === 'ice' ? 'flash flash-ice' : 'flash flash-fire'
+    flashOverlay.className = currentWinner === 'ice' ? 'flash flash-ice' : currentWinner === 'fire' ? 'flash flash-fire' : 'flash'
     setTimeout(() => { flashOverlay.className = '' }, 800)
 
-    spawnExplosion(centerX, centerY, currentWinner, 150)
+    spawnExplosion(centerX, centerY, currentWinner === 'tie' ? 'ice' : currentWinner, 150)
+    if (currentWinner === 'tie') {
+      setTimeout(() => spawnExplosion(centerX, centerY, 'fire', 150), 120)
+    }
 
     setTimeout(() => {
       suspenseBanner.style.display = 'none'
@@ -633,10 +643,16 @@ const audioController = new GotAudioController()
 
       if (currentWinner === 'ice') {
         outcomeScreen.style.backgroundImage = "url('assets/outcome_ice_dragon.jpg?v=11')"
+        outcomeScreen.style.backgroundColor = 'transparent'
         outcomeClaimTitle.innerHTML = 'ICE CLAIMS<br>THE THRONE'
-      } else {
+      } else if (currentWinner === 'fire') {
         outcomeScreen.style.backgroundImage = "url('assets/outcome_fire_dragon.jpg?v=11')"
+        outcomeScreen.style.backgroundColor = 'transparent'
         outcomeClaimTitle.innerHTML = 'FIRE CLAIMS<br>THE THRONE'
+      } else {
+        outcomeScreen.style.backgroundImage = 'none'
+        outcomeScreen.style.backgroundColor = '#000000'
+        outcomeClaimTitle.innerHTML = 'ANNIHILATION'
       }
 
       outcomeStage1.style.display = 'flex'
@@ -651,18 +667,29 @@ const audioController = new GotAudioController()
 
     if (currentWinner === 'ice') {
       outcomeScreen.style.backgroundImage = "url('assets/outcome_ice_galaxy.jpg?v=11')"
+      outcomeScreen.style.backgroundColor = 'transparent'
       outcomeStoryContent.innerHTML = 
         "ICE PREVAILED. ANTIMATTER SURVIVED INSTEAD OF<br>" +
         "MATTER &mdash; A MIRROR UNIVERSE, IDENTICAL IN EVERY<br>" +
         "LAW, OPPOSITE IN EVERY ATOM. SOMEWHERE IN THE<br>" +
         "MATHEMATICS, THIS WORLD EXISTS TOO."
-    } else {
+    } else if (currentWinner === 'fire') {
       outcomeScreen.style.backgroundImage = "url('assets/outcome_fire_galaxy.jpg?v=11')"
+      outcomeScreen.style.backgroundColor = 'transparent'
       outcomeStoryContent.innerHTML = 
         "FIRE PREVAILED. MATTER SURVIVED THE COLLISION &mdash;<br>" +
         "THE SAME IMBALANCE THAT BUILT STARS, PLANETS, AND<br>" +
         "EVERY LIVING THING. YOU ARE PROOF THAT FIRE WON,<br>" +
         "ONCE, AT THE BEGINNING OF EVERYTHING."
+    } else {
+      outcomeScreen.style.backgroundImage = 'none'
+      outcomeScreen.style.backgroundColor = '#000000'
+      outcomeStoryContent.innerHTML = 
+        "PERFECT BALANCE. FIRE AND ICE CANCELLED<br>" +
+        "COMPLETELY &mdash; NO SURVIVOR, NO IMBALANCE, NO<br>" +
+        "UNIVERSE. JUST LIGHT, EXPANDING INTO NOTHING.<br>" +
+        "THIS IS THE OUTCOME PHYSICS PREDICTS... AND THE<br>" +
+        "ONE THAT NEVER HAPPENED."
     }
   })
 
