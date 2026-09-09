@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Who Will Take the Iron Throne? — Live Battle</title>
+<title>A Song of Ice and Fire — Live Realm Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
   @font-face {
     font-family: 'Trajan';
@@ -19,12 +19,10 @@
   :root {
     --bg: #000000;
     --gold: #d7b97e;
-    --gold-dim: #9a8253;
-    --gold-light: #e5c178;
-    --ice: #4fb3ff;
-    --fire: #ff4520;
-    --ice-glow: rgba(79,179,255,0.5);
-    --fire-glow: rgba(255,69,32,0.5);
+    --ice: #00b4ff;
+    --fire: #ff6000;
+    --ice-glow: rgba(0, 180, 255, 0.45);
+    --fire-glow: rgba(255, 96, 0, 0.45);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,6 +36,25 @@
     align-items: center;
     justify-content: center;
     overflow-x: hidden;
+    user-select: none;
+  }
+
+  /* Atmospheric Mountain Landscape Background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(ellipse at 15% 25%, rgba(30, 95, 170, 0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 25%, rgba(185, 75, 20, 0.22) 0%, transparent 55%),
+      linear-gradient(to bottom, rgba(2, 4, 6, 0.5) 0%, rgba(5, 8, 14, 0.35) 40%, rgba(2, 4, 6, 0.75) 100%),
+      url('assets/mountain_bg.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transform: scaleX(-1);
+    pointer-events: none;
+    z-index: 0;
   }
 
   /* Fullscreen particle FX canvas */
@@ -77,172 +94,190 @@
     transition: opacity 0.8s ease-out;
   }
   #flash-overlay.flash-ice {
-    background: radial-gradient(circle, #c8e8ff 0%, #4fb3ff 60%, transparent 100%);
+    background: radial-gradient(circle, #c8e8ff 0%, #00b4ff 60%, transparent 100%);
   }
   #flash-overlay.flash-fire {
-    background: radial-gradient(circle, #ffeedd 0%, #ff4520 60%, transparent 100%);
+    background: radial-gradient(circle, #ffeedd 0%, #ff6000 60%, transparent 100%);
   }
 
   .container {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 640px;
-    padding: 36px 20px;
+    max-width: 680px;
+    padding: 30px 20px;
     text-align: center;
   }
 
-  .got-title {
+  /* Title Matching Reference Screenshot */
+  .title-intro {
     font-family: 'Trajan', 'Cinzel', serif;
-    font-size: clamp(1.6em, 5vw, 2.5em);
-    font-weight: 700;
-    letter-spacing: 4px;
-    color: var(--gold);
+    font-size: clamp(1.8rem, 4.8vw, 3rem);
+    letter-spacing: 5px;
+    line-height: 1.35;
+    margin-bottom: 24px;
     text-transform: uppercase;
-    line-height: 1.25;
-    margin-bottom: 6px;
-    text-shadow: 0 0 25px rgba(215, 185, 126, 0.3);
+  }
+  .title-intro .sub-line {
+    font-size: 0.6em;
+    letter-spacing: 6px;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .c-ice {
+    color: #7ec2eb;
+    text-shadow: 0 0 16px rgba(126, 194, 235, 0.4);
+  }
+  .c-fire {
+    color: #e87834;
+    text-shadow: 0 0 16px rgba(232, 120, 52, 0.4);
+  }
+  .c-silver {
+    color: #d4d8dc;
   }
 
-  span.o-char {
-    display: inline-block;
-    position: relative;
-  }
-  span.o-char::after {
-    content: '';
-    position: absolute;
-    top: 15%;
-    bottom: 15%;
-    left: 50%;
-    width: 2px;
-    background: var(--gold);
-    transform: translateX(-50%);
-  }
-
-  .subtitle {
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #9a8f7a;
+  /* Dashboard Scores Section */
+  .dash-columns {
+    display: flex;
+    gap: clamp(30px, 8vw, 90px);
+    justify-content: center;
     margin-bottom: 36px;
   }
 
-  /* Score Panels */
-  .scores {
+  .player-column {
     display: flex;
-    gap: 18px;
-    justify-content: center;
-    margin-bottom: 32px;
-  }
-
-  .score-card {
-    flex: 1;
-    max-width: 230px;
-    padding: 26px 16px;
-    border-radius: 20px;
-    background: rgba(10, 10, 12, 0.9);
-    border: 1px solid rgba(215, 185, 126, 0.2);
-    backdrop-filter: blur(10px);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .score-card.ice.active {
-    box-shadow: 0 0 35px var(--ice-glow);
-    border-color: rgba(79,179,255,0.7);
-    transform: translateY(-3px);
-  }
-  .score-card.fire.active {
-    box-shadow: 0 0 35px var(--fire-glow);
-    border-color: rgba(255,69,32,0.7);
-    transform: translateY(-3px);
-  }
-
-  .score-card .team-icon {
-    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 90px;
-    margin-bottom: 8px;
+    width: clamp(140px, 26vw, 190px);
   }
-  .score-card .dash-flame {
-    width: 65px;
-    height: 90px;
+
+  .column-flame {
+    width: clamp(55px, 10vw, 75px);
+    height: clamp(80px, 14vw, 110px);
     object-fit: contain;
     mix-blend-mode: screen;
-    transition: transform 0.3s ease;
-  }
-  .score-card.fire .dash-flame {
-    filter: drop-shadow(0 0 16px rgba(255, 69, 32, 0.8));
-    animation: flameFloatFire 3.5s ease-in-out infinite alternate;
-  }
-  .score-card.ice .dash-flame {
-    filter: drop-shadow(0 0 16px rgba(79, 179, 255, 0.8));
-    animation: flameFloatIce 3.5s ease-in-out infinite alternate;
-  }
-  @keyframes flameFloatFire {
-    from { transform: translateY(0); }
-    to { transform: translateY(-6px) scale(1.04); }
-  }
-  @keyframes flameFloatIce {
-    from { transform: translateY(0); }
-    to { transform: translateY(-6px) scale(1.04); }
-  }
-  .score-card .team-name {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #8c8270;
-    margin-bottom: 4px;
-  }
-  .score-card .leader-name {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
     margin-bottom: 12px;
+    animation: flameHover 3.5s ease-in-out infinite alternate;
   }
-  .score-card.ice .leader-name { color: var(--ice); }
-  .score-card.fire .leader-name { color: var(--fire); }
+  .column-flame.ice {
+    filter: drop-shadow(0 0 25px rgba(0, 180, 255, 0.8));
+  }
+  .column-flame.fire {
+    filter: drop-shadow(0 0 25px rgba(255, 96, 0, 0.8));
+    animation-delay: -1.8s;
+  }
+  @keyframes flameHover {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+  }
 
-  .score-card .count {
+  /* Score Box Card */
+  .score-box {
+    width: 100%;
+    height: clamp(150px, 24vw, 190px);
+    border-radius: 28px;
+    background: rgba(4, 8, 14, 0.65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.9);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    border: 1.5px solid transparent;
+  }
+  .score-box.ice {
+    border-color: rgba(0, 180, 255, 0.75);
+    box-shadow: 0 0 25px rgba(0, 180, 255, 0.25);
+  }
+  .score-box.fire {
+    border-color: rgba(255, 96, 0, 0.75);
+    box-shadow: 0 0 25px rgba(255, 96, 0, 0.25);
+  }
+
+  .score-box .count {
     font-family: 'Trajan', 'Cinzel', serif;
-    font-size: 54px;
-    font-weight: 900;
+    font-size: clamp(48px, 9vw, 68px);
+    font-weight: 700;
     line-height: 1;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
   }
-  .score-card.ice .count { color: var(--ice); text-shadow: 0 0 20px var(--ice-glow); }
-  .score-card.fire .count { color: var(--fire); text-shadow: 0 0 20px var(--fire-glow); }
+  .score-box.ice .count {
+    color: #00b4ff;
+    text-shadow: 0 0 25px rgba(0, 180, 255, 0.6);
+  }
+  .score-box.fire .count {
+    color: #ff6000;
+    text-shadow: 0 0 25px rgba(255, 96, 0, 0.6);
+  }
 
-  .score-card .label {
+  .score-box .label {
+    font-family: 'Trajan', 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #8a96a4;
+  }
+
+  /* Player Badge Pill below card */
+  .player-pill-badge {
+    margin-top: 16px;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(4, 8, 14, 0.75);
+    border: 1px solid transparent;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+  .player-pill-badge.ice {
+    border-color: rgba(0, 180, 255, 0.6);
+  }
+  .player-pill-badge.fire {
+    border-color: rgba(255, 96, 0, 0.6);
+  }
+
+  .badge-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .player-pill-badge.ice .badge-title { color: #7ec2eb; }
+  .player-pill-badge.fire .badge-title { color: #e87834; }
+
+  .badge-sub {
     font-size: 10px;
     letter-spacing: 2px;
+    color: #8c96a0;
     text-transform: uppercase;
-    color: #706858;
-    margin-top: 6px;
   }
 
-  /* Action Button: Rectangular Pill with Dual Border */
+  /* Claim Action Button */
   .throne-btn {
-    display: inline-block;
-    padding: 15px 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 44px;
     border-radius: 12px;
     background: rgba(6, 10, 16, 0.75);
-    color: #d4d8dc;
+    color: var(--silver-text);
     font-family: 'Trajan', 'Cinzel', serif;
-    font-size: clamp(12px, 2.5vw, 14px);
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 3.5px;
     text-transform: uppercase;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 18px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.85);
     border: 1px solid transparent;
     background-image: linear-gradient(rgba(6, 10, 16, 0.8), rgba(6, 10, 16, 0.8)), 
-                      linear-gradient(to right, rgba(126, 194, 235, 0.6), rgba(232, 120, 52, 0.6));
+                      linear-gradient(to right, rgba(126, 194, 235, 0.65), rgba(232, 120, 52, 0.65));
     background-origin: border-box;
     background-clip: padding-box, border-box;
     position: relative;
@@ -250,8 +285,8 @@
   }
   .throne-btn:hover:not(:disabled) {
     color: #ffffff;
-    transform: scale(1.03);
-    box-shadow: 0 0 25px rgba(126, 194, 235, 0.5), 0 0 25px rgba(232, 120, 52, 0.5);
+    transform: scale(1.04);
+    box-shadow: 0 0 25px rgba(126, 194, 235, 0.45), 0 0 25px rgba(232, 120, 52, 0.45);
     background-image: linear-gradient(rgba(12, 18, 28, 0.9), rgba(12, 18, 28, 0.9)), 
                       linear-gradient(to right, rgba(126, 194, 235, 0.95), rgba(232, 120, 52, 0.95));
   }
@@ -267,22 +302,23 @@
   /* Result Reveal */
   .result {
     display: none;
-    padding: 32px 20px;
-    border-radius: 18px;
-    background: rgba(8, 8, 10, 0.95);
-    border: 1px solid rgba(215, 185, 126, 0.3);
+    padding: 28px 20px;
+    border-radius: 16px;
+    background: rgba(6, 10, 16, 0.9);
+    border: 1px solid rgba(215, 185, 126, 0.35);
     backdrop-filter: blur(14px);
     position: relative;
+    margin-top: 10px;
   }
   .result.show {
     display: block;
-    animation: revealDramatic 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: revealDramatic 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   @keyframes revealDramatic {
     0% {
       opacity: 0;
-      transform: translateY(30px) scale(0.85);
+      transform: translateY(20px) scale(0.9);
     }
     100% {
       opacity: 1;
@@ -291,47 +327,44 @@
   }
 
   .result .crown {
-    font-size: 56px;
-    margin-bottom: 10px;
+    font-size: 50px;
+    margin-bottom: 8px;
     display: inline-block;
   }
 
   .result .winner-title {
     font-family: 'Trajan', 'Cinzel', serif;
-    font-size: clamp(1.2em, 3.8vw, 1.7em);
-    font-weight: 900;
+    font-size: clamp(1.2em, 3.8vw, 1.6em);
+    font-weight: 700;
     letter-spacing: 3px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     line-height: 1.3;
   }
-  .result.ice-wins .winner-title { color: var(--ice); text-shadow: 0 0 25px var(--ice-glow); }
-  .result.fire-wins .winner-title { color: var(--fire); text-shadow: 0 0 25px var(--fire-glow); }
+  .result.ice-wins .winner-title { color: #00b4ff; text-shadow: 0 0 25px var(--ice-glow); }
+  .result.fire-wins .winner-title { color: #ff6000; text-shadow: 0 0 25px var(--fire-glow); }
   .result.tie .winner-title { color: var(--gold); text-shadow: 0 0 25px rgba(215, 185, 126, 0.5); }
 
-  .result.ice-wins { border-color: rgba(79,179,255,0.5); box-shadow: 0 0 50px var(--ice-glow); }
-  .result.fire-wins { border-color: rgba(255,69,32,0.5); box-shadow: 0 0 50px var(--fire-glow); }
-  .result.tie { border-color: rgba(215,185,126,0.5); box-shadow: 0 0 50px rgba(215,185,126,0.3); }
-
-  .result .verdict {
-    font-size: 13px;
+  .result .winner-sub {
+    font-size: 11px;
     letter-spacing: 2px;
-    color: #c9bca0;
-    line-height: 1.6;
-    margin-top: 8px;
+    text-transform: uppercase;
+    color: #9a8f7a;
   }
 
   /* Suspense Banner */
   #suspense-banner {
     display: none;
     font-family: 'Trajan', 'Cinzel', serif;
-    font-size: 15px;
+    font-size: 14px;
     letter-spacing: 3px;
-    color: var(--gold-light);
-    margin-bottom: 24px;
-    animation: suspensePulse 0.4s infinite alternate;
+    color: #e5c178;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    text-shadow: 0 0 15px rgba(229,193,120,0.6);
+    animation: pulseBanner 0.6s ease-in-out infinite alternate;
   }
-  @keyframes suspensePulse {
-    from { opacity: 0.6; transform: scale(0.98); }
+  @keyframes pulseBanner {
+    from { opacity: 0.7; transform: scale(0.98); }
     to { opacity: 1; transform: scale(1.02); }
   }
 
@@ -394,338 +427,292 @@
 <div id="flash-overlay"></div>
 
 <div class="container" id="main-container">
-  <h1 class="got-title">
-    <span style="font-size:0.6em;letter-spacing:6px;display:block;margin-bottom:4px;background:linear-gradient(90deg,#7ec2eb,#e87834);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">A SONG OF</span>
-    <span style="background:linear-gradient(90deg,#7ec2eb,#e87834);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">ICE AND FIRE</span>
+  <h1 class="title-intro">
+    <span class="sub-line"><span class="c-ice">A SONG</span> <span class="c-fire">OF</span></span>
+    <span class="c-ice">ICE</span> <span class="c-silver">AND</span> <span class="c-fire">FIRE</span>
   </h1>
-  <div class="subtitle"><span style="color:#7ec2eb">ANTIMATTER</span> <span style="color:#8c94a0">VS</span> <span style="color:#e87834">MATTER</span> &middot; <span style="color:#8c94a0">REALM BATTLE TRACKER</span></div>
 
-  <div class="scores">
-    <div class="score-card ice" id="ice-card">
-      <div class="team-icon">
-        <img src="assets/ice_flame.png" alt="Antimatter / Ice" class="dash-flame">
+  <div class="dash-columns">
+    <!-- PLAYER 1 · ICE COLUMN -->
+    <div class="player-column">
+      <img src="assets/ice_flame.png" alt="Ice Flame" class="column-flame ice">
+      <div class="score-box ice" id="ice-card">
+        <div class="count" id="ice-count">00</div>
+        <div class="label">COLLECTED</div>
       </div>
-      <div class="team-name">PLAYER 1 &middot; ANTIMATTER</div>
-      <div class="leader-name">NIGHT KING (ICE)</div>
-      <div class="count" id="ice-count">0</div>
-      <div class="label">collected</div>
+      <div class="player-pill-badge ice">
+        <div class="badge-title">PLAYER 1</div>
+        <div class="badge-sub">ICE</div>
+      </div>
     </div>
-    <div class="score-card fire" id="fire-card">
-      <div class="team-icon">
-        <img src="assets/fire_flame.png" alt="Matter / Fire" class="dash-flame">
+
+    <!-- PLAYER 2 · FIRE COLUMN -->
+    <div class="player-column">
+      <img src="assets/fire_flame.png" alt="Fire Flame" class="column-flame fire">
+      <div class="score-box fire" id="fire-card">
+        <div class="count" id="fire-count">00</div>
+        <div class="label">COLLECTED</div>
       </div>
-      <div class="team-name">PLAYER 2 &middot; MATTER</div>
-      <div class="leader-name">DAENERYS (FIRE)</div>
-      <div class="count" id="fire-count">0</div>
-      <div class="label">collected</div>
+      <div class="player-pill-badge fire">
+        <div class="badge-title">PLAYER 2</div>
+        <div class="badge-sub">FIRE</div>
+      </div>
     </div>
   </div>
 
   <div id="suspense-banner">⚔️ SUMMONING THE IRON THRONE... ⚔️</div>
 
-  <button class="throne-btn" id="throne-btn" disabled>
-    ⚔️ WHO WILL TAKE THE IRON THRONE? ⚔️
-  </button>
+  <button class="throne-btn" id="throne-btn" disabled>CLAIM</button>
 
   <div class="result" id="result">
-    <div class="crown" id="result-crown"></div>
-    <div class="winner-title" id="result-title"></div>
-    <div class="verdict" id="result-verdict"></div>
+    <div class="crown" id="result-crown">👑</div>
+    <div class="winner-title" id="winner-text">ICE TAKES THE THRONE</div>
+    <div class="winner-sub" id="winner-sub">MATTER REIGNS OVER ANTIMATTER</div>
   </div>
 </div>
 
-<div class="status" id="status">connecting to realm…</div>
+<div class="status" id="status">CONNECTING TO REALM RELAY...</div>
 
 <script>
-(()=>{
+// --- Fullscreen Particle FX Engine ---
+const canvas = document.getElementById('fx-canvas')
+const ctx = canvas.getContext('2d')
+let width = (canvas.width = window.innerWidth)
+let height = (canvas.height = window.innerHeight)
+
+window.addEventListener('resize', () => {
+  width = canvas.width = window.innerWidth
+  height = canvas.height = window.innerHeight
+})
+
+const fxParticles = []
+
+class FxParticle {
+  constructor(x, y, color, speed, size, life) {
+    this.x = x
+    this.y = y
+    this.color = color
+    this.vx = (Math.random() - 0.5) * speed
+    this.vy = (Math.random() - 0.5) * speed - (Math.random() * 2)
+    this.size = size || Math.random() * 4 + 2
+    this.life = life || 1
+    this.maxLife = this.life
+    this.alpha = 1
+  }
+  update() {
+    this.x += this.vx
+    this.y += this.vy
+    this.vy += 0.05
+    this.life -= 0.015
+    this.alpha = Math.max(0, this.life / this.maxLife)
+    this.size *= 0.985
+  }
+  draw() {
+    ctx.save()
+    ctx.globalAlpha = this.alpha
+    ctx.fillStyle = this.color
+    ctx.shadowColor = this.color
+    ctx.shadowBlur = 10
+    ctx.beginPath()
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+  }
+}
+
+function spawnExplosion(x, y, team, count = 80) {
+  const colors = team === 'ice'
+    ? ['#c8e8ff', '#4fb3ff', '#1e5fa5', '#ffffff', '#8cd7ff']
+    : ['#ffeedd', '#ff4520', '#ff8c00', '#ffffff', '#ffd700']
+  for (let i = 0; i < count; i++) {
+    const color = colors[Math.floor(Math.random() * colors.length)]
+    fxParticles.push(new FxParticle(x, y, color, Math.random() * 12 + 4, Math.random() * 5 + 2, Math.random() * 1.5 + 0.5))
+  }
+}
+
+function renderFx() {
+  ctx.clearRect(0, 0, width, height)
+  for (let i = fxParticles.length - 1; i >= 0; i--) {
+    const p = fxParticles[i]
+    p.update()
+    p.draw()
+    if (p.life <= 0 || p.size <= 0.5) {
+      fxParticles.splice(i, 1)
+    }
+  }
+  requestAnimationFrame(renderFx)
+}
+renderFx()
+
+// Audio Controller: Pure GoT Theme Song playback
+class GotAudioController {
+  constructor() {
+    this.bgm = new Audio('https://ia800109.us.archive.org/20/items/GameOfThronesTheme_201608/GameOfThronesTheme.mp3')
+    this.bgm.volume = 0.8
+    this.bgm.preload = 'auto'
+  }
+  playThroneMusic() {
+    try {
+      this.bgm.currentTime = 0
+      this.bgm.play().catch(e => console.log('Audio autoplay prevented:', e))
+    } catch(e) {}
+  }
+}
+const audioController = new GotAudioController()
+
+// --- Realm Dashboard Logic ---
+(() => {
   const iceCountEl = document.getElementById('ice-count')
   const fireCountEl = document.getElementById('fire-count')
   const iceCard = document.getElementById('ice-card')
   const fireCard = document.getElementById('fire-card')
   const throneBtn = document.getElementById('throne-btn')
-  const resultEl = document.getElementById('result')
+  const resultDiv = document.getElementById('result')
+  const winnerText = document.getElementById('winner-text')
+  const winnerSub = document.getElementById('winner-sub')
   const resultCrown = document.getElementById('result-crown')
-  const resultTitle = document.getElementById('result-title')
-  const resultVerdict = document.getElementById('result-verdict')
   const statusEl = document.getElementById('status')
-  const mainContainer = document.getElementById('main-container')
-  const flashOverlay = document.getElementById('flash-overlay')
   const suspenseBanner = document.getElementById('suspense-banner')
-  const fxCanvas = document.getElementById('fx-canvas')
-  const ctx = fxCanvas.getContext('2d')
+  const flashOverlay = document.getElementById('flash-overlay')
+  const mainContainer = document.getElementById('main-container')
 
-  let iceScore = 0
-  let fireScore = 0
-  let particles = []
-  let animId = null
+  let currentIce = 0
+  let currentFire = 0
+  let hasInteracted = false
 
-  // Resize particle canvas
-  const resizeCanvas = () => {
-    fxCanvas.width = window.innerWidth
-    fxCanvas.height = window.innerHeight
-  }
-  window.addEventListener('resize', resizeCanvas)
-  resizeCanvas()
+  const formatDigits = (n) => String(n).padStart(2, '0')
 
-  // Audio: Official Game of Thrones Theme Track
-  const themeAudio = new Audio('assets/got-theme.mp3')
-  themeAudio.preload = 'auto'
-  themeAudio.volume = 1.0
-
-  const playGotThemeAudio = () => {
-    try {
-      themeAudio.currentTime = 0
-      const playPromise = themeAudio.play()
-      if (playPromise !== undefined) {
-        playPromise.catch(err => {
-          console.log('Audio playback waiting for user gesture or loading:', err)
-        })
-      }
-    } catch(e) {
-      console.error('Audio play error:', e)
+  function updateScores(ice, fire) {
+    if (ice !== currentIce) {
+      currentIce = ice
+      iceCountEl.textContent = formatDigits(ice)
+      iceCountEl.style.transform = 'scale(1.2)'
+      setTimeout(() => { iceCountEl.style.transform = 'scale(1)' }, 200)
     }
-  }
-
-  // Particle explosion logic
-  const spawnParticles = (type) => {
-    const cx = window.innerWidth / 2
-    const cy = window.innerHeight / 2
-    particles = []
-
-    const count = 180
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2
-      const speed = 2 + Math.random() * 12
-      const size = 3 + Math.random() * 8
-      const life = 60 + Math.random() * 60
-
-      let color
-      if (type === 'ice') {
-        const blues = ['#4fb3ff', '#a0dcff', '#ffffff', '#70c5ff', '#1f70b0']
-        color = blues[Math.floor(Math.random() * blues.length)]
-      } else if (type === 'fire') {
-        const reds = ['#ff4520', '#ff825a', '#ffcc00', '#ffffff', '#d43000']
-        color = reds[Math.floor(Math.random() * reds.length)]
-      } else {
-        const golds = ['#c5a059', '#e5c178', '#4fb3ff', '#ff4520', '#ffffff']
-        color = golds[Math.floor(Math.random() * golds.length)]
-      }
-
-      particles.push({
-        x: cx,
-        y: cy,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - (type === 'fire' ? 1.5 : 0),
-        size,
-        color,
-        life,
-        maxLife: life,
-        spin: (Math.random() - 0.5) * 0.2
-      })
+    if (fire !== currentFire) {
+      currentFire = fire
+      fireCountEl.textContent = formatDigits(fire)
+      fireCountEl.style.transform = 'scale(1.2)'
+      setTimeout(() => { fireCountEl.style.transform = 'scale(1)' }, 200)
     }
 
-    if (!animId) loopParticles()
-  }
-
-  const loopParticles = () => {
-    ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height)
-    let alive = 0
-
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i]
-      if (p.life > 0) {
-        p.x += p.vx
-        p.y += p.vy
-        p.vx *= 0.98
-        p.vy *= 0.98
-        p.life--
-        const alpha = p.life / p.maxLife
-
-        ctx.save()
-        ctx.globalAlpha = alpha
-        ctx.fillStyle = p.color
-        ctx.shadowColor = p.color
-        ctx.shadowBlur = 10
-
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.restore()
-
-        alive++
-      }
+    if (currentIce > 0 || currentFire > 0) {
+      throneBtn.removeAttribute('disabled')
     }
 
-    if (alive > 0) {
-      animId = requestAnimationFrame(loopParticles)
-    } else {
-      animId = null
-      ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height)
-    }
-  }
-
-  const updateScores = (ice, fire) => {
-    iceScore = ice
-    iceCountEl.textContent = ice
-    if (ice > 0) {
+    if (currentIce > currentFire) {
       iceCard.classList.add('active')
+      fireCard.classList.remove('active')
+    } else if (currentFire > currentIce) {
+      fireCard.classList.add('active')
+      iceCard.classList.remove('active')
     } else {
       iceCard.classList.remove('active')
-    }
-
-    fireScore = fire
-    fireCountEl.textContent = fire
-    if (fire > 0) {
-      fireCard.classList.add('active')
-    } else {
       fireCard.classList.remove('active')
     }
+  }
 
-    // Enable button when at least one team has scored
-    throneBtn.disabled = !(iceScore > 0 || fireScore > 0)
+  function revealWinner() {
+    throneBtn.style.display = 'none'
+    suspenseBanner.style.display = 'block'
+    mainContainer.classList.add('screen-shake')
+    setTimeout(() => { mainContainer.classList.remove('screen-shake') }, 800)
+
+    audioController.playThroneMusic()
+
+    const winner = currentIce > currentFire ? 'ice' : currentFire > currentIce ? 'fire' : 'tie'
+    const centerX = window.innerWidth / 2
+    const centerY = window.innerHeight / 2
+
+    flashOverlay.className = winner === 'ice' ? 'flash flash-ice' : winner === 'fire' ? 'flash flash-fire' : 'flash'
+    setTimeout(() => { flashOverlay.className = '' }, 800)
+
+    spawnExplosion(centerX, centerY, winner === 'tie' ? 'ice' : winner, 150)
+    if (winner === 'tie') {
+      setTimeout(() => spawnExplosion(centerX, centerY, 'fire', 150), 100)
+    }
+
+    setTimeout(() => {
+      suspenseBanner.style.display = 'none'
+      resultDiv.className = 'result show ' + (winner === 'ice' ? 'ice-wins' : winner === 'fire' ? 'fire-wins' : 'tie')
+
+      if (winner === 'ice') {
+        resultCrown.textContent = '❄️👑'
+        winnerText.textContent = 'ICE TAKES THE THRONE'
+        winnerSub.textContent = 'PLAYER 1 (ANTIMATTER) VANQUISHES MATTER'
+      } else if (winner === 'fire') {
+        resultCrown.textContent = '🔥👑'
+        winnerText.textContent = 'FIRE TAKES THE THRONE'
+        winnerSub.textContent = 'PLAYER 2 (MATTER) CONQUERS THE REALM'
+      } else {
+        resultCrown.textContent = '⚔️👑'
+        winnerText.textContent = 'A REALM IN BALANCE'
+        winnerSub.textContent = 'MATTER & ANTIMATTER MEET IN TOTAL ANNIHILATION'
+      }
+    }, 1200)
   }
 
   throneBtn.addEventListener('click', () => {
-    const finalIce = iceScore
-    const finalFire = fireScore
-    const winnerType = finalIce > finalFire ? 'ice' : (finalFire > finalIce ? 'fire' : 'tie')
-
-    // 1. Play official Game of Thrones theme track directly
-    playGotThemeAudio()
-
-    // 2. Trigger screen shake
-    document.body.classList.remove('screen-shake')
-    void document.body.offsetWidth // reflow
-    document.body.classList.add('screen-shake')
-
-    // 3. Trigger flash overlay
-    flashOverlay.className = `flash flash-${winnerType}`
-    setTimeout(() => { flashOverlay.className = '' }, 500)
-
-    // 4. Trigger particle explosion
-    spawnParticles(winnerType)
-
-    // 5. Hide button & show suspense teaser banner
-    throneBtn.style.display = 'none'
-    suspenseBanner.style.display = 'block'
-    resultEl.classList.remove('show', 'ice-wins', 'fire-wins', 'tie')
-
-    // 6. Reveal victor after 1 second of dramatic suspense
-    setTimeout(() => {
-      suspenseBanner.style.display = 'none'
-      throneBtn.style.display = 'inline-block'
-
-      if (winnerType === 'ice') {
-        resultEl.classList.add('show', 'ice-wins')
-        resultCrown.innerHTML = '<img src="assets/ice_flame.png" style="width:75px;height:105px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 25px rgba(79,179,255,0.9));">'
-        resultTitle.textContent = 'THE NIGHT KING TAKES THE IRON THRONE'
-        resultVerdict.innerHTML = `Viserion's icy blizzard freezes the realm.<br>Ice ${finalIce} — Fire ${finalFire}`
-      } else if (winnerType === 'fire') {
-        resultEl.classList.add('show', 'fire-wins')
-        resultCrown.innerHTML = '<img src="assets/fire_flame.png" style="width:75px;height:105px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 25px rgba(255,69,32,0.9));">'
-        resultTitle.textContent = 'DAENERYS TAKES THE IRON THRONE'
-        resultVerdict.innerHTML = `Drogon's inferno melts the Iron Throne and creates a new dynasty.<br>Fire ${finalFire} — Ice ${finalIce}`
-      } else {
-        resultEl.classList.add('show', 'tie')
-        resultCrown.innerHTML = '<img src="assets/yinyang.png" style="width:85px;height:85px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 25px rgba(215,185,126,0.9));">'
-        resultTitle.textContent = 'NO ONE TAKES THE IRON THRONE'
-        resultVerdict.innerHTML = `Ice and Fire have clashed to an exact standstill.<br>Ice ${finalIce} — Fire ${finalFire}<br><span style="color:var(--gold);font-weight:700;letter-spacing:1.5px;display:inline-block;margin-top:6px">THE IRON THRONE STANDS EMPTY</span>`
-      }
-
-      // Reset counters to zero immediately
-      updateScores(0, 0)
-
-      // Notify relay server to reset all stored scores to zero for the next battle
-      try {
-        if (socket && socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({ type: 'reset' }))
-        }
-        fetch(`${httpRelay}/reset?room=${encodeURIComponent(room)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'cors'
-        }).catch(() => {})
-      } catch(e) {}
-    }, 1000)
+    hasInteracted = true
+    revealWinner()
   })
 
-  // WebSocket auto-connect
-  const params = new URLSearchParams(window.location.search)
-  const relay = params.get('relay') || 'wss://score-relay.iceandfire.workers.dev'
-  const room = params.get('room') || 'quantum1'
+  // --- WebSocket Live Connection ---
+  const WORKER_HOST = 'got-ar-backend.dr-e-backend.workers.dev'
+  let ws = null
+  let reconnectTimer = null
 
-  let socket = null
-
-  const connect = () => {
-    const url = `${relay}/ws?room=${encodeURIComponent(room)}&name=dashboard&role=viewer`
-    socket = new WebSocket(url)
-
-    socket.addEventListener('open', () => {
-      statusEl.textContent = `connected · room "${room}"`
-      statusEl.className = 'status connected'
-    })
-
-    socket.addEventListener('close', () => {
-      statusEl.textContent = 'disconnected · reconnecting…'
-      statusEl.className = 'status'
-      setTimeout(connect, 2000)
-    })
-
-    socket.addEventListener('error', () => {
-      socket.close()
-    })
-
-    socket.addEventListener('message', (event) => {
-      try {
-        const msg = JSON.parse(event.data)
-        console.log('WS received:', msg)
-
-        // Handle relay broadcast format: {type:"state", scores: {Ice: {ice, fire}, Fire: {ice, fire}}}
-        if (msg.type === 'state' && msg.scores) {
-          let totalIce = 0, totalFire = 0
-          Object.values(msg.scores).forEach(s => {
-            totalIce += (s.ice || 0)
-            totalFire += (s.fire || 0)
-          })
-          updateScores(totalIce, totalFire)
-        }
-
-        // Handle relay broadcast format: {type:"state", players:[{name, ice, fire, total}]}
-        if (msg.type === 'state' && msg.players) {
-          let totalIce = 0, totalFire = 0
-          msg.players.forEach(p => {
-            totalIce += (p.ice || 0)
-            totalFire += (p.fire || 0)
-          })
-          updateScores(totalIce, totalFire)
-        }
-
-        // Handle direct player score: {type:"score", name:"Ice"/"Fire", ice:N, fire:N}
-        if (msg.type === 'score') {
-          updateScores(msg.ice || 0, msg.fire || 0)
-        }
-
-        // Handle any message with ice/fire fields (catch-all)
-        if (typeof msg.ice === 'number' || typeof msg.fire === 'number') {
-          updateScores(msg.ice || 0, msg.fire || 0)
-        }
-      } catch(e) {
-        console.error('bad message', e)
-      }
-    })
-  }
-
-  connect()
-
-  // 1-second background state polling fallback (guarantees real-time sync with 0 page refreshes)
-  const httpRelay = relay.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:')
-  const pollState = async () => {
+  function connectWS() {
     try {
-      const res = await fetch(`${httpRelay}/state?room=${encodeURIComponent(room)}`)
+      ws = new WebSocket('wss://' + WORKER_HOST + '/ws?role=dashboard')
+
+      ws.onopen = () => {
+        statusEl.textContent = 'REALM LIVE &middot; TRACKING SCORES'
+        statusEl.classList.add('connected')
+        if (reconnectTimer) clearTimeout(reconnectTimer)
+      }
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data)
+          if (msg.type === 'state' && msg.data) {
+            let totalIce = 0
+            let totalFire = 0
+            if (msg.data.scores) {
+              Object.values(msg.data.scores).forEach(s => {
+                totalIce += (s.ice || 0)
+                totalFire += (s.fire || 0)
+              })
+            }
+            updateScores(totalIce, totalFire)
+          }
+        } catch(e) {}
+      }
+
+      ws.onclose = () => {
+        statusEl.textContent = 'RECONNECTING TO REALM RELAY...'
+        statusEl.classList.remove('connected')
+        reconnectTimer = setTimeout(connectWS, 3000)
+      }
+
+      ws.onerror = () => {
+        try { ws.close() } catch(e) {}
+      }
+    } catch(e) {
+      reconnectTimer = setTimeout(connectWS, 3000)
+    }
+  }
+  connectWS()
+
+  // Fallback Polling
+  async function pollState() {
+    try {
+      const res = await fetch('https://' + WORKER_HOST + '/state')
       if (res.ok) {
         const data = await res.json()
         if (data && data.scores) {
-          let totalIce = 0, totalFire = 0
+          let totalIce = 0
+          let totalFire = 0
           Object.values(data.scores).forEach(s => {
             totalIce += (s.ice || 0)
             totalFire += (s.fire || 0)
@@ -740,6 +727,6 @@
 })()
 </script>
 
-<script src="assets/fire-cursor.js?v=3"></script>
+<script src="assets/fire-cursor.js?v=8"></script>
 </body>
 </html>
