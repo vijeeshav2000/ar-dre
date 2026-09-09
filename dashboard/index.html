@@ -30,7 +30,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
-    background: #040609;
+    background: #000000;
     color: #e2e8f0;
     font-family: 'Trajan', 'Cinzel', serif;
     min-height: 100vh;
@@ -38,23 +38,6 @@
     align-items: center;
     justify-content: center;
     overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      radial-gradient(ellipse at 15% 25%, rgba(30, 95, 170, 0.2) 0%, transparent 55%),
-      radial-gradient(ellipse at 85% 25%, rgba(185, 75, 20, 0.2) 0%, transparent 55%),
-      linear-gradient(to bottom, rgba(2, 4, 6, 0.55) 0%, rgba(5, 8, 14, 0.35) 40%, rgba(2, 4, 6, 0.8) 100%),
-      url('assets/mountain_bg.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    transform: scaleX(-1);
-    pointer-events: none;
-    z-index: 0;
   }
 
   /* Fullscreen particle FX canvas */
@@ -412,8 +395,8 @@
 
 <div class="container" id="main-container">
   <h1 class="got-title">
-    <span style="font-size:0.62em;letter-spacing:5px;display:block;margin-bottom:4px;"><span style="color:#7ec2eb">A SONG</span> <span style="color:#e87834">OF</span></span>
-    <span style="color:#7ec2eb">ICE</span> <span style="color:#d4d8dc">AND</span> <span style="color:#e87834">FIRE</span>
+    <span style="font-size:0.6em;letter-spacing:6px;display:block;margin-bottom:4px;background:linear-gradient(90deg,#7ec2eb,#e87834);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">A SONG OF</span>
+    <span style="background:linear-gradient(90deg,#7ec2eb,#e87834);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">ICE AND FIRE</span>
   </h1>
   <div class="subtitle"><span style="color:#7ec2eb">ANTIMATTER</span> <span style="color:#8c94a0">VS</span> <span style="color:#e87834">MATTER</span> &middot; <span style="color:#8c94a0">REALM BATTLE TRACKER</span></div>
 
