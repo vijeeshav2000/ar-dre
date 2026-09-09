@@ -26,7 +26,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
-    background: var(--bg-dark);
+    background: #000000;
     color: #e2e8f0;
     font-family: 'Trajan', 'Cinzel', serif;
     min-height: 100vh;
@@ -38,24 +38,6 @@
     user-select: none;
   }
 
-  /* Atmospheric Mountain Background matching the references */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      radial-gradient(ellipse at 15% 25%, rgba(30, 95, 170, 0.22) 0%, transparent 55%),
-      radial-gradient(ellipse at 85% 25%, rgba(185, 75, 20, 0.22) 0%, transparent 55%),
-      linear-gradient(to bottom, rgba(2, 4, 6, 0.5) 0%, rgba(5, 8, 14, 0.3) 40%, rgba(2, 4, 6, 0.75) 100%),
-      url('assets/mountain_bg.jpg');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    transform: scaleX(-1);
-    pointer-events: none;
-    z-index: 0;
-  }
-
   /* Slide Viewport */
   .slide-viewport {
     position: relative;
@@ -64,6 +46,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #000000;
     z-index: 1;
   }
 
