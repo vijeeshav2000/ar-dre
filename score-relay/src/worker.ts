@@ -34,7 +34,7 @@ export default {
 export class ScoreRoom {
   state: DurableObjectState;
   sessions: Set<WebSocket>;
-  scores: Record<string, { ice: number; fire: number }>;
+  scores: Record<string, { ice: number; fire: number; reveal?: boolean }>;
 
   constructor(state: DurableObjectState) {
     this.state = state;
@@ -138,7 +138,8 @@ export class ScoreRoom {
   }
 
   broadcast(message: string) {
-    for (const session of this.sessions) {
+    const sockets = typeof this.state.getWebSockets === 'function' ? this.state.getWebSockets() : Array.from(this.sessions);
+    for (const session of sockets) {
       try {
         session.send(message);
       } catch (e) {
