@@ -1,7 +1,6 @@
 (()=>{"use strict";
 let chosenElement = localStorage.getItem("quantum1-player-element") || "fire";
 let _ws = null;
-let _wsRetryDelay = 2000;
 const _params = new URLSearchParams(window.location.search);
 const _relay = _params.get("relay") || "https://score-relay.iceandfire.workers.dev";
 const _wsRelay = _relay.replace(/^http/, "ws");
@@ -13,18 +12,10 @@ const _connectWS = () => {
     const url = `${_wsRelay}/ws?room=${encodeURIComponent(_room)}&name=${encodeURIComponent(team)}&role=player`;
     if (_ws) { try { _ws.close(); } catch(e){} }
     _ws = new WebSocket(url);
-    _ws.addEventListener("open", () => {
-      _wsRetryDelay = 2000;
-      console.log("score-sync: ws connected as", team);
-    });
-    _ws.addEventListener("close", () => {
-      setTimeout(_connectWS, _wsRetryDelay);
-      _wsRetryDelay = Math.min(_wsRetryDelay * 1.5, 15000);
-    });
+    _ws.addEventListener("open", () => { console.log("score-sync: ws connected as", team); });
+    _ws.addEventListener("close", () => { setTimeout(_connectWS, 2000); });
     _ws.addEventListener("error", () => { try { _ws.close(); } catch(e){} });
-  } catch(e) {
-    setTimeout(_connectWS, _wsRetryDelay);
-  }
+  } catch(e) {}
 };
 _connectWS();
 
@@ -37,14 +28,13 @@ const _sendScore = (ice, fire) => {
     try { _ws.send(JSON.stringify(msg)); } catch(e) {}
   }
   
-  // 2. Always also send via REST (belt+suspenders — works even if WS drops)
+  // 2. Dual fallback: Instant REST POST
   try {
     fetch(`${_relay}/score?room=${encodeURIComponent(_room)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(msg),
-      mode: "cors",
-      keepalive: true
+      mode: "cors"
     }).catch(()=>{});
   } catch(e) {}
 };
@@ -78,29 +68,7 @@ chosenElement=el;
 _hasChosen=true;
 _d.remove();_s.remove();
 _connectWS();
-// Retry round start at multiple delays to handle async 8th Wall init
-const _tryStart = (attempts) => {
-  if(attempts <= 0) return;
-  if(_startRound){ try{_startRound();}catch(e){} }
-  else { setTimeout(()=>_tryStart(attempts-1), 600); }
-};
-_tryStart(5);
-[100,500,1000,2000,3000].forEach(ms=>setTimeout(()=>{ if(_startRound){ try{_startRound();}catch(e){} } },ms));
-// Hook into the 8th Wall ITEM_COLLECTED event as a reliable score sync trigger
-const _hookItemCollected = () => {
-  try {
-    const ecs = window.ecs;
-    if(!ecs) return;
-    ecs.events && ecs.events.addListener && ecs.events.addListener(ecs.events.globalId,"ITEM_COLLECTED",(data)=>{
-      const total = data && data.total ? data.total : 0;
-      _sendScore(
-        "ice"===chosenElement.toLowerCase()?total:0,
-        "fire"===chosenElement.toLowerCase()?total:0
-      );
-    });
-  } catch(e) {}
-};
-setTimeout(_hookItemCollected, 2000);
+if(_startRound){ try{_startRound();}catch(e){} }
 });
 });
 };
