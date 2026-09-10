@@ -4,3 +4,8 @@ node_modules/
 .env.*
 .wrangler/
 scratch*.js
+
+# Large unused reference assets & duplicates
+assets/261186*
+assets/47740.jpg
+assets/opo0501a*
