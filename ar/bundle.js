@@ -7,41 +7,22 @@ const _relay = _params.get("relay") || "https://score-relay.iceandfire.workers.d
 const _wsRelay = _relay.replace(/^http/, "ws");
 const _room = _params.get("room") || "quantum1";
 
-// -- Visible debug status overlay (shows WS state on device screen) --
-const _dbg = document.createElement("div");
-_dbg.id = "_score_dbg";
-_dbg.style.cssText = "position:fixed;bottom:8px;left:8px;z-index:99999999;background:rgba(0,0,0,0.75);color:#0ff;font-size:11px;padding:4px 8px;border-radius:6px;pointer-events:none;font-family:monospace;max-width:180px;";
-_dbg.textContent = "WS: init";
-const _dbgMount = () => { (document.body || document.documentElement).appendChild(_dbg); };
-document.body ? _dbgMount() : window.addEventListener("DOMContentLoaded", _dbgMount);
-
 const _connectWS = () => {
   try {
     const team = "ice" === chosenElement.toLowerCase() ? "Ice" : "Fire";
     const url = `${_wsRelay}/ws?room=${encodeURIComponent(_room)}&name=${encodeURIComponent(team)}&role=player`;
     if (_ws) { try { _ws.close(); } catch(e){} }
-    _dbg.textContent = "WS: connecting...";
     _ws = new WebSocket(url);
     _ws.addEventListener("open", () => {
-      _dbg.textContent = "WS: LIVE ✓";
-      _dbg.style.color = "#0f0";
       _wsRetryDelay = 2000;
       console.log("score-sync: ws connected as", team);
     });
-    _ws.addEventListener("close", (ev) => {
-      _dbg.textContent = "WS: closed (" + ev.code + ") retry...";
-      _dbg.style.color = "#ff0";
+    _ws.addEventListener("close", () => {
       setTimeout(_connectWS, _wsRetryDelay);
       _wsRetryDelay = Math.min(_wsRetryDelay * 1.5, 15000);
     });
-    _ws.addEventListener("error", (ev) => {
-      _dbg.textContent = "WS: error - using REST";
-      _dbg.style.color = "#f80";
-      try { _ws.close(); } catch(e){}
-    });
+    _ws.addEventListener("error", () => { try { _ws.close(); } catch(e){} });
   } catch(e) {
-    _dbg.textContent = "WS: exception - " + e.message;
-    _dbg.style.color = "#f00";
     setTimeout(_connectWS, _wsRetryDelay);
   }
 };
@@ -50,15 +31,13 @@ _connectWS();
 const _sendScore = (ice, fire) => {
   const team = "ice" === chosenElement.toLowerCase() ? "Ice" : "Fire";
   const msg = { type: "score", name: team, ice: ice, fire: fire };
-  const total = ice || fire;
-  _dbg.textContent = "WS:" + (_ws && _ws.readyState === 1 ? "LIVE" : "REST") + " | " + team + ":" + total;
   
   // 1. Send via WebSocket
   if (_ws && _ws.readyState === WebSocket.OPEN) {
     try { _ws.send(JSON.stringify(msg)); } catch(e) {}
   }
   
-  // 2. Always also send via REST (belt+suspenders for mobile)
+  // 2. Always also send via REST (belt+suspenders — works even if WS drops)
   try {
     fetch(`${_relay}/score?room=${encodeURIComponent(_room)}`, {
       method: "POST",
@@ -99,7 +78,29 @@ chosenElement=el;
 _hasChosen=true;
 _d.remove();_s.remove();
 _connectWS();
-if(_startRound){ try{_startRound();}catch(e){} }
+// Retry round start at multiple delays to handle async 8th Wall init
+const _tryStart = (attempts) => {
+  if(attempts <= 0) return;
+  if(_startRound){ try{_startRound();}catch(e){} }
+  else { setTimeout(()=>_tryStart(attempts-1), 600); }
+};
+_tryStart(5);
+[100,500,1000,2000,3000].forEach(ms=>setTimeout(()=>{ if(_startRound){ try{_startRound();}catch(e){} } },ms));
+// Hook into the 8th Wall ITEM_COLLECTED event as a reliable score sync trigger
+const _hookItemCollected = () => {
+  try {
+    const ecs = window.ecs;
+    if(!ecs) return;
+    ecs.events && ecs.events.addListener && ecs.events.addListener(ecs.events.globalId,"ITEM_COLLECTED",(data)=>{
+      const total = data && data.total ? data.total : 0;
+      _sendScore(
+        "ice"===chosenElement.toLowerCase()?total:0,
+        "fire"===chosenElement.toLowerCase()?total:0
+      );
+    });
+  } catch(e) {}
+};
+setTimeout(_hookItemCollected, 2000);
 });
 });
 };
