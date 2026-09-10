@@ -610,7 +610,11 @@ const audioController = new GotAudioController()
     }
   }
 
-  function revealWinner() {
+  let winnerRevealed = false
+  function revealWinner(winnerOverride) {
+    if (winnerRevealed) return
+    winnerRevealed = true
+
     throneBtn.style.display = 'none'
     suspenseBanner.style.display = 'block'
     mainContainer.classList.add('screen-shake')
@@ -618,7 +622,9 @@ const audioController = new GotAudioController()
 
     audioController.playThroneMusic()
 
-    if (currentIce > currentFire) {
+    if (winnerOverride) {
+      currentWinner = winnerOverride
+    } else if (currentIce > currentFire) {
       currentWinner = 'ice'
     } else if (currentFire > currentIce) {
       currentWinner = 'fire'
@@ -720,11 +726,22 @@ const audioController = new GotAudioController()
             const scoresObj = msg.scores || (msg.data && msg.data.scores) || {}
             let totalIce = 0
             let totalFire = 0
+            let shouldReveal = false
             Object.values(scoresObj).forEach(s => {
               totalIce += (s.ice || 0)
               totalFire += (s.fire || 0)
+              if (s.reveal) shouldReveal = true
             })
             updateScores(totalIce, totalFire)
+            if (shouldReveal && !winnerRevealed) {
+              setTimeout(() => revealWinner(), 800)
+            }
+          } else if (msg.type === 'universe') {
+            // Direct universe broadcast from worker
+            if (!winnerRevealed) {
+              const w = msg.winner || (msg.totalIce > msg.totalFire ? 'ice' : msg.totalFire > msg.totalIce ? 'fire' : 'tie')
+              setTimeout(() => revealWinner(w), 800)
+            }
           }
         } catch(e) {}
       }
@@ -744,7 +761,7 @@ const audioController = new GotAudioController()
   }
   connectWS()
 
-  // Fallback Polling
+  // Fallback Polling — also detects reveal flag if WS is down
   async function pollState() {
     try {
       const res = await fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID))
@@ -753,11 +770,16 @@ const audioController = new GotAudioController()
         const scoresObj = data.scores || (data.data && data.data.scores) || {}
         let totalIce = 0
         let totalFire = 0
+        let shouldReveal = false
         Object.values(scoresObj).forEach(s => {
           totalIce += (s.ice || 0)
           totalFire += (s.fire || 0)
+          if (s.reveal) shouldReveal = true
         })
         updateScores(totalIce, totalFire)
+        if (shouldReveal && !winnerRevealed) {
+          setTimeout(() => revealWinner(), 800)
+        }
       }
     } catch(e) {}
   }

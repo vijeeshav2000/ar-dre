@@ -5,15 +5,29 @@ export interface Env {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' };
 
-    if (url.pathname === '/ws') {
-      const roomId = url.searchParams.get('room') || 'default';
-      const id = env.SCORE_ROOM.idFromName(roomId);
-      const room = env.SCORE_ROOM.get(id);
-      return room.fetch(request);
+    // CORS preflight
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 200, headers: cors });
     }
 
-    return new Response('AR-DRE Score Relay Service Running', { status: 200 });
+    const roomId = url.searchParams.get('room') || 'default';
+    const id = env.SCORE_ROOM.idFromName(roomId);
+    const room = env.SCORE_ROOM.get(id);
+
+    if (url.pathname === '/ws' || url.pathname === '/state' || url.pathname === '/score' || url.pathname === '/universe' || url.pathname === '/reset') {
+      const res = await room.fetch(request);
+      // Attach CORS headers to non-websocket responses
+      if (res.status !== 101) {
+        const newHeaders = new Headers(res.headers);
+        Object.entries(cors).forEach(([k, v]) => newHeaders.set(k, v));
+        return new Response(res.body, { status: res.status, headers: newHeaders });
+      }
+      return res;
+    }
+
+    return new Response('AR-DRE Score Relay Service Running', { status: 200, headers: cors });
   },
 };
 
@@ -30,6 +44,45 @@ export class ScoreRoom {
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
+    const cors = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
+
+    // --- HTTP REST handlers ---
+    if (url.pathname === '/state') {
+      return new Response(JSON.stringify({ type: 'state', scores: this.scores }), { headers: cors });
+    }
+
+    if (url.pathname === '/score' && request.method === 'POST') {
+      try {
+        const body: any = await request.json();
+        const { name, ice, fire, reveal } = body;
+        if (name) {
+          this.scores[name] = { ice: ice || 0, fire: fire || 0 };
+          if (reveal) (this.scores[name] as any).reveal = true;
+        }
+        this.broadcast(JSON.stringify({ type: 'state', scores: this.scores }));
+        return new Response(JSON.stringify({ success: true, scores: this.scores }), { headers: cors });
+      } catch(e) {
+        return new Response(JSON.stringify({ error: 'bad request' }), { status: 400, headers: cors });
+      }
+    }
+
+    if (url.pathname === '/reset') {
+      this.scores = {};
+      this.broadcast(JSON.stringify({ type: 'state', scores: this.scores }));
+      return new Response(JSON.stringify({ success: true }), { headers: cors });
+    }
+
+    if (url.pathname === '/universe') {
+      let totalIce = 0, totalFire = 0;
+      for (const s of Object.values(this.scores)) { totalIce += s.ice || 0; totalFire += s.fire || 0; }
+      let winner = 'tie';
+      if (totalIce > totalFire) winner = 'ice';
+      else if (totalFire > totalIce) winner = 'fire';
+      this.broadcast(JSON.stringify({ type: 'universe', winner, totalIce, totalFire }));
+      return new Response(JSON.stringify({ winner, totalIce, totalFire }), { headers: cors });
+    }
+
+    // --- WebSocket upgrade ---
     const role = url.searchParams.get('role') || 'player';
     const name = url.searchParams.get('name') || 'Player';
 
@@ -48,9 +101,10 @@ export class ScoreRoom {
         const data = JSON.parse(event.data as string);
 
         if (data.type === 'score') {
-          const { name, ice, fire } = data;
+          const { name, ice, fire, reveal } = data;
           if (name) {
             this.scores[name] = { ice: ice || 0, fire: fire || 0 };
+            if (reveal) this.scores[name].reveal = true;
           }
           // Broadcast score state to all connected clients
           this.broadcast(JSON.stringify({ type: 'state', scores: this.scores }));
