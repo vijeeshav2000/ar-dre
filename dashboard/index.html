@@ -341,6 +341,13 @@
     text-transform: uppercase;
     text-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
     margin-bottom: 36px;
+    background: rgba(6, 10, 16, 0.78);
+    padding: 24px 34px;
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
   }
 
   /* Suspense Banner */
@@ -672,7 +679,7 @@ const audioController = new GotAudioController();
     outcomeStage2.style.display = 'flex'
 
     if (currentWinner === 'ice') {
-      outcomeScreen.style.backgroundImage = "url('assets/outcome_ice_galaxy.jpg?v=11')"
+      outcomeScreen.style.backgroundImage = "url('assets/outcome_ice_galaxy.jpg?v=20')"
       outcomeScreen.style.backgroundColor = 'transparent'
       outcomeStoryContent.innerHTML = 
         "ICE PREVAILED. ANTIMATTER SURVIVED INSTEAD OF<br>" +
@@ -680,7 +687,7 @@ const audioController = new GotAudioController();
         "LAW, OPPOSITE IN EVERY ATOM. SOMEWHERE IN THE<br>" +
         "MATHEMATICS, THIS WORLD EXISTS TOO."
     } else if (currentWinner === 'fire') {
-      outcomeScreen.style.backgroundImage = "url('assets/outcome_fire_galaxy.jpg?v=11')"
+      outcomeScreen.style.backgroundImage = "url('assets/outcome_fire_galaxy.jpg?v=20')"
       outcomeScreen.style.backgroundColor = 'transparent'
       outcomeStoryContent.innerHTML = 
         "FIRE PREVAILED. MATTER SURVIVED THE COLLISION &mdash;<br>" +
