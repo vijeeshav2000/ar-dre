@@ -257,6 +257,30 @@
     filter: drop-shadow(0 0 30px rgba(255, 69, 32, 0.7));
     animation-delay: -2s;
   }
+
+  /* Slide 3 Enlarged Flames & Compressed Lore Text (Reference Alignment) */
+  #slide-3 .side-flames-row {
+    max-width: 1120px;
+    justify-content: center;
+    gap: clamp(20px, 4vw, 60px);
+    margin-bottom: 0;
+  }
+  #slide-3 .flame-icon-left,
+  #slide-3 .flame-icon-right {
+    width: clamp(150px, 20vw, 240px);
+    height: clamp(280px, 42vh, 460px);
+  }
+  #slide-3 .lore-text-block {
+    max-width: 520px;
+    font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+    line-height: 1.65;
+    letter-spacing: 2px;
+    padding: 0 10px;
+    margin-bottom: 0;
+  }
+  #slide-3 .lore-line {
+    margin-bottom: 0px;
+  }
   @keyframes floatVertical {
     from { transform: translateY(0px); }
     to { transform: translateY(-10px); }
