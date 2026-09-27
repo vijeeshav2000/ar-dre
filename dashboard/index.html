@@ -127,16 +127,14 @@
     margin-bottom: 4px;
     display: block;
   }
-  .c-ice {
-    color: #7ec2eb;
-    text-shadow: 0 0 16px rgba(126, 194, 235, 0.4);
-  }
-  .c-fire {
-    color: #e87834;
-    text-shadow: 0 0 16px rgba(232, 120, 52, 0.4);
-  }
-  .c-silver {
-    color: #d4d8dc;
+
+  /* Single Continuous Gradient Matching Other Screens (Ice -> White -> Fire) */
+  .text-grad-lr {
+    background: linear-gradient(90deg, #4fa8e0 0%, #90d5f8 24%, #ffffff 50%, #f4ad58 76%, #e86420 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    filter: drop-shadow(0 0 16px rgba(126, 194, 235, 0.25)) drop-shadow(0 0 16px rgba(232, 120, 52, 0.25));
   }
 
   /* Dashboard Scores Section */
@@ -433,8 +431,8 @@
 
 <div class="container" id="main-container">
   <h1 class="title-intro">
-    <span class="sub-line"><span class="c-ice">A SONG</span> <span class="c-fire">OF</span></span>
-    <span class="c-ice">ICE</span> <span class="c-silver">AND</span> <span class="c-fire">FIRE</span>
+    <span class="sub-line text-grad-lr">A SONG OF</span>
+    <span class="text-grad-lr">ICE AND FIRE</span>
   </h1>
 
   <div class="dash-columns">
