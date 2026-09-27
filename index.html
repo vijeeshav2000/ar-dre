@@ -445,6 +445,16 @@
     </div>
 
     <button class="got-action-btn" onclick="goToSlide(6)">RULES OF THE GAME</button>
+
+    <div id="player-status" style="
+      margin-top: 22px;
+      font-family: 'Trajan', 'Cinzel', serif;
+      font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      text-align: center;
+    ">WAITING FOR PLAYERS...</div>
   </div>
 
   <!-- SCREEN 6: RULES OF THE GAME (TO DASHBOARD) -->
@@ -515,6 +525,50 @@
       if (currentSlide > 1) goToSlide(currentSlide - 1);
     }
   });
+
+  // --- Auto-navigate to dashboard when 2 players have scanned & joined ---
+  const RELAY_URL = 'https://score-relay.iceandfire.workers.dev/state?room=quantum1';
+  const playerStatusEl = document.getElementById('player-status');
+  let playerPollInterval = null;
+
+  async function checkPlayers() {
+    try {
+      const res = await fetch(RELAY_URL);
+      if (!res.ok) return;
+      const data = await res.json();
+      const scores = data.scores || {};
+      const count = Object.keys(scores).length;
+
+      if (count === 0) {
+        playerStatusEl.textContent = 'WAITING FOR PLAYERS...';
+        playerStatusEl.style.color = 'rgba(255,255,255,0.55)';
+      } else if (count === 1) {
+        playerStatusEl.textContent = '1 PLAYER JOINED — WAITING FOR PLAYER 2...';
+        playerStatusEl.style.color = 'rgba(126, 194, 235, 0.85)';
+      } else if (count >= 2) {
+        playerStatusEl.textContent = '⚔️ BOTH PLAYERS READY — LAUNCHING DASHBOARD...';
+        playerStatusEl.style.color = 'rgba(232, 120, 52, 1)';
+        clearInterval(playerPollInterval);
+        // Short delay so they can see the message, then auto-navigate
+        setTimeout(() => { window.location.href = './dashboard/'; }, 1500);
+      }
+    } catch(e) {}
+  }
+
+  // Start polling as soon as slide-5 is visible
+  const originalGoToSlide = goToSlide;
+  // Override goToSlide to start/stop polling based on current slide
+  window.goToSlide = (n) => {
+    originalGoToSlide(n);
+    if (n === 5) {
+      clearInterval(playerPollInterval);
+      playerPollInterval = setInterval(checkPlayers, 2000);
+      checkPlayers(); // immediate first check
+    } else {
+      clearInterval(playerPollInterval);
+    }
+  };
+
 </script>
 
 <script src="assets/fire-cursor.js?v=12"></script>
