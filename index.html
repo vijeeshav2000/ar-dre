@@ -163,20 +163,22 @@
     padding: 0 15px;
   }
 
-  /* Slide 2 lore text — compact, 5-line composition matching reference */
+  /* Slide 2 lore text — compact 5-line composition, full width so NO words are cut off */
   #slide-2 .lore-text-block {
-    width: clamp(380px, 42vw, 420px);
-    max-width: 420px;
-    padding: 0 8px;
+    width: min(92vw, 700px);
+    max-width: 700px;
+    margin: 0 auto 30px;
+    padding: 0 10px;
     font-size: clamp(1.05rem, 1.9vw, 1.35rem);
     line-height: 1.65;
-    margin-bottom: 30px;
+    overflow: visible;
     box-sizing: border-box;
   }
 
   @media (min-width: 600px) {
     #slide-2 .lore-line {
       white-space: nowrap;
+      overflow: visible;
     }
   }
 
