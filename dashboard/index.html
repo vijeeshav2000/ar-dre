@@ -424,6 +424,7 @@
 </style>
 </head>
 <body>
+<audio id="got-bgm" src="assets/got-theme.mp3" preload="auto" style="display:none"></audio>
 
 <a href="../" class="home-btn">&larr; HOME</a>
 
@@ -555,45 +556,18 @@ function renderFx() {
 }
 renderFx()
 
-// Audio Controller: Pure GoT Theme Song playback
-class GotAudioController {
-  constructor() {
-    this.bgm = new Audio('assets/got-theme.mp3?v=3')
-    this.bgm.volume = 0.8
-    this.bgm.preload = 'auto'
-    this.pendingPlay = false
+// GoT Theme — uses the <audio> element in the HTML for best browser support
+const _gotBgm = document.getElementById('got-bgm')
+_gotBgm.volume = 0.8
 
-    // Pre-warm on first any interaction so autoplay policy is satisfied
-    const prime = () => {
-      this.bgm.play().then(() => {
-        this.bgm.pause()
-        this.bgm.currentTime = 0
-        if (this.pendingPlay) {
-          this.pendingPlay = false
-          this.bgm.play().catch(() => {})
-        }
-      }).catch(() => {})
-      document.removeEventListener('click', prime)
-      document.removeEventListener('touchstart', prime)
-      document.removeEventListener('keydown', prime)
-    }
-    document.addEventListener('click', prime, { once: true, passive: true })
-    document.addEventListener('touchstart', prime, { once: true, passive: true })
-    document.addEventListener('keydown', prime, { once: true, passive: true })
-  }
-
-  playThroneMusic() {
-    this.bgm.currentTime = 0
-    const p = this.bgm.play()
-    if (p !== undefined) {
-      p.catch(() => {
-        // No user gesture yet — set flag so prime() fires it when user next touches
-        this.pendingPlay = true
-      })
-    }
-  }
+function playThroneMusic() {
+  _gotBgm.currentTime = 0
+  _gotBgm.play().catch(e => console.warn('Audio play failed:', e))
 }
-const audioController = new GotAudioController();
+
+// Compatibility shim so existing calls to audioController.playThroneMusic() still work
+const audioController = { playThroneMusic }
+
 
 // --- Realm Dashboard Logic ---
 (() => {
@@ -723,8 +697,7 @@ const audioController = new GotAudioController();
   })
 
   throneBtn.addEventListener('click', () => {
-    audioController.bgm.currentTime = 0
-    audioController.bgm.play().catch(() => {})
+    playThroneMusic()
     revealWinner()
   })
 
