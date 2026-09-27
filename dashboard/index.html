@@ -625,54 +625,121 @@ function renderFx() {
 }
 renderFx()
 
-// Audio Controller: Pure GoT Theme Song playback
+// Dual-Engine Audio Controller: Web Audio API + HTML5 Audio
 let shouldPlayMusic = false
 let isMuted = false
+let audioContext = null
+let audioBuffer = null
+let webAudioSource = null
 const bgm = document.getElementById('got-bgm')
 const soundToggleBtn = document.getElementById('sound-toggle-btn')
 const soundIcon = document.getElementById('sound-icon')
 const musicPromptBtns = [document.getElementById('music-prompt-btn-1'), document.getElementById('music-prompt-btn-2')]
 
+async function preloadWebAudio() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext
+    if (!AudioCtx) return
+    if (!audioContext) audioContext = new AudioCtx()
+    const res = await fetch('assets/got-theme.mp3')
+    if (res.ok) {
+      const arrayBuffer = await res.arrayBuffer()
+      audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
+      console.log('WebAudio decoded got-theme.mp3 successfully')
+    }
+  } catch (err) {
+    console.warn('WebAudio preload notice:', err)
+  }
+}
+preloadWebAudio()
+
+function isAudioPlaying() {
+  if (webAudioSource) return true
+  if (bgm && !bgm.paused) return true
+  return false
+}
+
 function updateSoundUI() {
   if (soundIcon) {
-    soundIcon.textContent = (bgm && !bgm.paused && !isMuted) ? '🔊' : '🔇'
+    soundIcon.textContent = (isAudioPlaying() && !isMuted) ? '🔊' : '🔇'
   }
-  const showPrompt = shouldPlayMusic && bgm && bgm.paused && !isMuted
+  const showPrompt = shouldPlayMusic && !isAudioPlaying() && !isMuted
   musicPromptBtns.forEach(btn => {
     if (btn) btn.style.display = showPrompt ? 'inline-flex' : 'none'
   })
 }
 
-function playThroneMusic() {
-  shouldPlayMusic = true
-  if (!bgm || isMuted) return
-  bgm.volume = 1.0
-  bgm.loop = true
-  const promise = bgm.play()
-  if (promise !== undefined) {
-    promise
-      .then(() => {
-        console.log('GoT theme playing!')
-        updateSoundUI()
-      })
-      .catch(err => {
-        console.warn('Autoplay prevented by browser:', err)
-        updateSoundUI()
-      })
+function tryPlayWebAudio() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext
+    if (!AudioCtx) return
+    if (!audioContext) audioContext = new AudioCtx()
+    if (audioContext.state === 'suspended') {
+      audioContext.resume().catch(() => {})
+    }
+    if (audioBuffer && !webAudioSource && !isMuted) {
+      webAudioSource = audioContext.createBufferSource()
+      webAudioSource.buffer = audioBuffer
+      webAudioSource.loop = true
+      webAudioSource.connect(audioContext.destination)
+      webAudioSource.start(0)
+      console.log('WebAudio playing GoT theme!')
+      updateSoundUI()
+    }
+  } catch (e) {
+    console.warn('tryPlayWebAudio error:', e)
   }
 }
 
+function playThroneMusic() {
+  shouldPlayMusic = true
+  if (isMuted) return
+
+  // 1. Try HTML5 Audio element
+  if (bgm) {
+    bgm.volume = 1.0
+    bgm.loop = true
+    const p = bgm.play()
+    if (p !== undefined) {
+      p.then(() => {
+        console.log('HTML5 Audio playing GoT theme')
+        updateSoundUI()
+      }).catch(err => {
+        console.warn('HTML5 play deferred, attempting WebAudio:', err)
+        tryPlayWebAudio()
+        updateSoundUI()
+      })
+    } else {
+      updateSoundUI()
+    }
+  } else {
+    tryPlayWebAudio()
+  }
+}
+
+function stopAllAudio() {
+  if (bgm) {
+    bgm.pause()
+    bgm.currentTime = 0
+  }
+  if (webAudioSource) {
+    try { webAudioSource.stop() } catch (e) {}
+    webAudioSource = null
+  }
+  updateSoundUI()
+}
+
 function toggleSound() {
-  if (!bgm) return
-  if (bgm.paused) {
+  if (isAudioPlaying()) {
+    isMuted = true
+    stopAllAudio()
+  } else {
     isMuted = false
     shouldPlayMusic = true
-    bgm.play().then(() => updateSoundUI()).catch(e => console.warn(e))
-  } else {
-    isMuted = true
-    bgm.pause()
-    updateSoundUI()
+    playThroneMusic()
+    tryPlayWebAudio()
   }
+  updateSoundUI()
 }
 
 if (soundToggleBtn) {
@@ -688,14 +755,19 @@ musicPromptBtns.forEach(btn => {
       e.stopPropagation()
       isMuted = false
       playThroneMusic()
+      tryPlayWebAudio()
     })
   }
 })
 
 // Any click / tap on screen plays audio if throne was claimed
 const triggerAudioOnGesture = () => {
-  if (shouldPlayMusic && bgm && bgm.paused && !isMuted) {
-    bgm.play().then(() => updateSoundUI()).catch(() => {})
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().catch(() => {})
+  }
+  if (shouldPlayMusic && !isAudioPlaying() && !isMuted) {
+    playThroneMusic()
+    tryPlayWebAudio()
   }
 }
 window.addEventListener('pointerdown', triggerAudioOnGesture)
