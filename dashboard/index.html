@@ -424,7 +424,7 @@
 </style>
 </head>
 <body>
-<audio id="got-bgm" src="assets/got-theme.mp3" preload="auto" style="display:none"></audio>
+<audio id="got-audio" src="assets/got-theme.mp3" preload="auto" style="display:none"></audio>
 
 <a href="../" class="home-btn">&larr; HOME</a>
 
@@ -556,18 +556,18 @@ function renderFx() {
 }
 renderFx()
 
-// GoT Theme — uses the <audio> element in the HTML for best browser support
-const _gotBgm = document.getElementById('got-bgm')
-_gotBgm.volume = 0.8
-
-function playThroneMusic() {
-  _gotBgm.currentTime = 0
-  _gotBgm.play().catch(e => console.warn('Audio play failed:', e))
+// Audio Controller: GoT Theme using HTML audio element
+class GotAudioController {
+  constructor() {
+    this.bgm = document.getElementById('got-audio')
+    this.bgm.volume = 0.85
+  }
+  playThroneMusic() {
+    this.bgm.currentTime = 0
+    this.bgm.play().catch(e => console.warn('GoT audio play blocked:', e))
+  }
 }
-
-// Compatibility shim so existing calls to audioController.playThroneMusic() still work
-const audioController = { playThroneMusic }
-
+const audioController = new GotAudioController();
 
 // --- Realm Dashboard Logic ---
 (() => {
@@ -697,7 +697,8 @@ const audioController = { playThroneMusic }
   })
 
   throneBtn.addEventListener('click', () => {
-    playThroneMusic()
+    audioController.bgm.currentTime = 0
+    audioController.bgm.play().catch(() => {})
     revealWinner()
   })
 
