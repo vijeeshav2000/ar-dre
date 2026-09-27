@@ -295,6 +295,50 @@
     to { transform: translateY(-10px); }
   }
 
+  /* Screen 4 Rules Graphic Screen */
+  .rules-screen-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: min(1080px, 94vw);
+    max-height: 86vh;
+    margin: auto;
+  }
+
+  .rules-screen-img {
+    width: 100%;
+    height: auto;
+    max-height: 85vh;
+    object-fit: contain;
+    display: block;
+    cursor: pointer;
+  }
+
+  .rules-scan-btn {
+    position: absolute;
+    left: 40%;
+    top: 74.5%;
+    width: 20%;
+    height: 8.5%;
+    border-radius: 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .rules-scan-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 25px rgba(126, 194, 235, 0.5), 0 0 25px rgba(232, 120, 52, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .rules-scan-btn:active {
+    transform: scale(0.97);
+  }
+
   /* Screen 5 QR Code Box */
   .qr-center-box {
     background: #ffffff;
@@ -441,18 +485,12 @@
     </div>
   </div>
 
-  <!-- SCREEN 4: NOW, YOU DECIDE WHAT REMAINS -->
+  <!-- SCREEN 4: GAME RULES / HOW TO PLAY -->
   <div class="slide" id="slide-4">
-    <div class="lore-text-block" style="margin-bottom: 40px;">
-      <span class="lore-line text-grad-lr" style="font-size: clamp(1.2rem, 3vw, 1.65rem); letter-spacing: 4px;">
-        NOW, YOU DECIDE
-      </span>
-      <span class="lore-line text-grad-lr" style="font-size: clamp(1.2rem, 3vw, 1.65rem); letter-spacing: 4px; margin-top: 4px;">
-        WHAT REMAINS
-      </span>
+    <div class="rules-screen-container">
+      <img src="assets/RULES.png?v=3" alt="Game Rules: Two Players, 30 Seconds to Collect, Tap Screen to Collect" class="rules-screen-img" onclick="goToSlide(5)">
+      <button class="rules-scan-btn" onclick="goToSlide(5)" aria-label="Scan QR Code"></button>
     </div>
-
-    <button class="got-action-btn" onclick="goToSlide(5)">CONTINUE</button>
   </div>
 
   <!-- SCREEN 5: SCAN TO PLAY -->
