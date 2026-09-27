@@ -499,7 +499,7 @@
 <body>
 <audio id="got-audio" src="assets/got-theme.mp3" preload="auto" style="display:none"></audio>
 
-<a href="../" class="home-btn">&larr; HOME</a>
+<button class="home-btn" onclick="startNewGame()">&larr; HOME</button>
 
 <canvas id="fx-canvas"></canvas>
 <div id="flash-overlay"></div>
@@ -889,7 +889,8 @@ const audioController = new GotAudioController();
 
   // --- WebSocket Live Connection ---
   const WORKER_HOST = 'score-relay.iceandfire.workers.dev'
-  const ROOM_ID = 'quantum1'
+  const _dashParams = new URLSearchParams(window.location.search)
+  const ROOM_ID = _dashParams.get('room') || sessionStorage.getItem('current_room') || 'quantum1'
   let ws = null
   let reconnectTimer = null
 
@@ -997,15 +998,33 @@ const audioController = new GotAudioController();
   initDashboard()
 })()
 
-// --- New Game: reset relay server then return to exhibition screen (QR code display) ---
+// --- New Game: Completely reset previous game, clear state, and return to HOME screen ---
 async function startNewGame() {
   const WORKER_HOST = 'score-relay.iceandfire.workers.dev'
-  const ROOM_ID = 'quantum1'
+  const _params = new URLSearchParams(window.location.search)
+  const currentRoom = _params.get('room') || sessionStorage.getItem('current_room') || 'quantum1'
+
+  // Reset relay rooms
   try {
-    await fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(ROOM_ID), { method: 'POST' })
+    await fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(currentRoom), { method: 'POST' })
+    if (currentRoom !== 'quantum1') {
+      await fetch('https://' + WORKER_HOST + '/reset?room=quantum1', { method: 'POST' })
+    }
   } catch(e) {}
-  // Go back to the exhibition screen at Slide 5 (QR code display) for the next round
-  window.location.href = '../?slide=5&v=' + Date.now()
+
+  // Clear local storage and session data
+  try {
+    sessionStorage.clear()
+    localStorage.removeItem('quantum1-player-element')
+    localStorage.removeItem('active_room')
+  } catch(e) {}
+
+  // Generate a completely clean session ID
+  const newRoom = 'realm_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6)
+  sessionStorage.setItem('current_room', newRoom)
+
+  // Navigate to HOME screen (Slide 1) with clean state
+  window.location.href = '../?reset=1&room=' + encodeURIComponent(newRoom) + '&v=' + Date.now()
 }
 
 
