@@ -171,13 +171,37 @@
     line-height: 2.1;
   }
 
-  /* Slide 3 lore text — compact, natural wrap, like reference image */
+  /* Slide 3 lore text & container layout — match reference image width and rhythm */
+  #slide-3 .side-flames-row {
+    max-width: 1140px;
+    width: 100%;
+    justify-content: center;
+    gap: clamp(16px, 3.5vw, 50px);
+  }
+
   #slide-3 .lore-text-block {
-    max-width: 580px;
+    flex: 0 0 auto;
+    width: clamp(470px, 48vw, 540px);
+    max-width: 540px;
     font-size: clamp(0.9rem, 1.5vw, 1.1rem);
     line-height: 1.9;
     letter-spacing: 2px;
     text-align: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 600px) {
+    #slide-3 .lore-line {
+      white-space: nowrap;
+    }
+  }
+
+  #slide-3 .flame-icon-left, 
+  #slide-3 .flame-icon-right {
+    flex: 0 1 auto;
+    width: clamp(140px, 18vw, 230px);
+    height: clamp(280px, 42vw, 440px);
   }
 
   .lore-line {
@@ -396,18 +420,20 @@
 
   <!-- SCREEN 3: PHYSICS & COSMOLOGY -->
   <div class="slide" id="slide-3">
-    <div class="side-flames-row" style="margin-bottom: 0; justify-content: space-between; max-width: 960px;">
-      <img src="assets/ice_flame.png?v=13" alt="Ice Flame" class="flame-icon-left">
+    <div class="side-flames-row" style="margin-bottom: 0;">
+      <img src="assets/ice_flame.png?v=15" alt="Ice Flame" class="flame-icon-left">
 
       <div class="lore-text-block" style="margin-bottom: 0;">
-        <span class="lore-line text-grad-lr">THIS ISN'T ONLY A STORY. IN PHYSICS, EVERY PARTICLE</span>
-        <span class="lore-line text-grad-lr">OF MATTER HAS A MIRROR OPPOSITE &mdash; ANTIMATTER.</span>
-        <span class="lore-line text-grad-lr">AND WHEN THEY MEET, LIKE ICE AND FIRE, NEITHER SURVIVES.</span>
-        <span class="lore-line text-grad-lr">THE UNIVERSE SHOULD HAVE CANCELLED ITSELF INTO NOTHING.</span>
-        <span class="lore-line text-grad-lr">IT DIDN'T. THIS IS WHAT REMAINED.</span>
+        <span class="lore-line text-grad-lr">THIS ISN'T ONLY A STORY. IN PHYSICS, EVERY</span>
+        <span class="lore-line text-grad-lr">PARTICLE OF MATTER HAS A MIRROR</span>
+        <span class="lore-line text-grad-lr">OPPOSITE &mdash; ANTIMATTER. AND WHEN THEY</span>
+        <span class="lore-line text-grad-lr">MEET, LIKE ICE AND FIRE, NEITHER SURVIVES.</span>
+        <span class="lore-line text-grad-lr">THE UNIVERSE SHOULD HAVE CANCELLED</span>
+        <span class="lore-line text-grad-lr">ITSELF INTO NOTHING. IT DIDN'T.</span>
+        <span class="lore-line text-grad-lr">THIS IS WHAT REMAINED.</span>
       </div>
 
-      <img src="assets/fire_flame.png?v=12" alt="Fire Flame" class="flame-icon-right">
+      <img src="assets/fire_flame.png?v=15" alt="Fire Flame" class="flame-icon-right">
     </div>
 
     <div style="margin-top: 32px; position: relative; z-index: 10;">
