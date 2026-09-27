@@ -558,15 +558,45 @@ renderFx()
 // Audio Controller: Pure GoT Theme Song playback
 class GotAudioController {
   constructor() {
-    this.bgm = new Audio('https://ia800109.us.archive.org/20/items/GameOfThronesTheme_201608/GameOfThronesTheme.mp3')
-    this.bgm.volume = 0.8
+    this.bgm = new Audio('assets/got-theme.mp3')
+    this.bgm.volume = 0.85
+    this.bgm.loop = true
     this.bgm.preload = 'auto'
+    this.isPlaying = false
+
+    const unlock = () => {
+      this.bgm.load()
+    }
+    window.addEventListener('click', unlock, { once: true })
+    window.addEventListener('touchstart', unlock, { once: true })
   }
+
   playThroneMusic() {
+    if (this.isPlaying) return
     try {
       this.bgm.currentTime = 0
-      this.bgm.play().catch(e => console.log('Audio autoplay prevented:', e))
-    } catch(e) {}
+      const promise = this.bgm.play()
+      if (promise !== undefined) {
+        promise
+          .then(() => {
+            this.isPlaying = true
+          })
+          .catch(e => {
+            console.log('Autoplay deferred until user interaction:', e)
+            const playOnGesture = () => {
+              this.bgm.play().then(() => {
+                this.isPlaying = true
+              }).catch(() => {})
+              window.removeEventListener('click', playOnGesture)
+              window.removeEventListener('touchstart', playOnGesture)
+            }
+            window.addEventListener('click', playOnGesture)
+            window.addEventListener('touchstart', playOnGesture)
+          })
+      }
+    } catch(e) {
+      console.log('Audio playback error:', e)
+    }
   }
 }
 const audioController = new GotAudioController();
@@ -680,6 +710,7 @@ const audioController = new GotAudioController();
   }
 
   outcomeSeeMoreBtn.addEventListener('click', () => {
+    audioController.playThroneMusic()
     outcomeStage1.style.display = 'none'
     outcomeStage2.style.display = 'flex'
 
