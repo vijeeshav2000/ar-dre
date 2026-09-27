@@ -558,44 +558,38 @@ renderFx()
 // Audio Controller: Pure GoT Theme Song playback
 class GotAudioController {
   constructor() {
-    this.bgm = new Audio('assets/got-theme.mp3?v=2')
+    this.bgm = new Audio('assets/got-theme.mp3?v=3')
     this.bgm.volume = 0.8
     this.bgm.preload = 'auto'
-    this.isUnlocked = false
+    this.pendingPlay = false
 
-    // Unlock audio context on first user interaction anywhere on the document
-    const unlock = () => {
-      if (this.isUnlocked) return
+    // Pre-warm on first any interaction so autoplay policy is satisfied
+    const prime = () => {
       this.bgm.play().then(() => {
         this.bgm.pause()
         this.bgm.currentTime = 0
-        this.isUnlocked = true
+        if (this.pendingPlay) {
+          this.pendingPlay = false
+          this.bgm.play().catch(() => {})
+        }
       }).catch(() => {})
-      document.removeEventListener('click', unlock)
-      document.removeEventListener('touchstart', unlock)
+      document.removeEventListener('click', prime)
+      document.removeEventListener('touchstart', prime)
+      document.removeEventListener('keydown', prime)
     }
-    document.addEventListener('click', unlock, { passive: true })
-    document.addEventListener('touchstart', unlock, { passive: true })
+    document.addEventListener('click', prime, { once: true, passive: true })
+    document.addEventListener('touchstart', prime, { once: true, passive: true })
+    document.addEventListener('keydown', prime, { once: true, passive: true })
   }
 
   playThroneMusic() {
-    try {
-      this.bgm.currentTime = 0
-      const promise = this.bgm.play()
-      if (promise !== undefined) {
-        promise.catch(e => {
-          console.log('Audio autoplay prevented, waiting for click:', e)
-          const playOnClick = () => {
-            this.bgm.play().catch(err => console.log('Play on click failed:', err))
-            document.removeEventListener('click', playOnClick)
-            document.removeEventListener('touchstart', playOnClick)
-          }
-          document.addEventListener('click', playOnClick, { passive: true })
-          document.addEventListener('touchstart', playOnClick, { passive: true })
-        })
-      }
-    } catch(e) {
-      console.log('Error playing theme music:', e)
+    this.bgm.currentTime = 0
+    const p = this.bgm.play()
+    if (p !== undefined) {
+      p.catch(() => {
+        // No user gesture yet — set flag so prime() fires it when user next touches
+        this.pendingPlay = true
+      })
     }
   }
 }
@@ -729,6 +723,8 @@ const audioController = new GotAudioController();
   })
 
   throneBtn.addEventListener('click', () => {
+    audioController.bgm.currentTime = 0
+    audioController.bgm.play().catch(() => {})
     revealWinner()
   })
 
