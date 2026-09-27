@@ -508,7 +508,7 @@
       <img src="assets/fire_flame.png?v=12" alt="Fire Flame" class="flame-icon-right">
     </div>
 
-    <button class="got-action-btn" onclick="goToSlide(6)">RULES OF THE GAME</button>
+    <a href="./dashboard/" class="got-action-btn">TO DASHBOARD</a>
 
     <div id="player-status" style="
       margin-top: 22px;
@@ -521,32 +521,6 @@
     ">WAITING FOR PLAYERS...</div>
   </div>
 
-  <!-- SCREEN 6: RULES OF THE GAME (TO DASHBOARD) -->
-  <div class="slide" id="slide-6">
-    <img src="assets/nightking_dragon.png?v=12" alt="Night King & Viserion" class="char-portrait-left">
-    <img src="assets/daenerys_dragon.png?v=12" alt="Daenerys & Drogon" class="char-portrait-right">
-
-    <div class="rules-frosted-card">
-      <div class="rules-line text-grad-lr">
-        TWO PLAYERS. TWO SIDES.
-      </div>
-      <div class="rules-line text-grad-lr" style="margin-top: 14px;">
-        CHOOSE YOUR ALLEGIANCE &mdash;
-      </div>
-      <div class="rules-line text-grad-lr" style="margin-top: 2px;">
-        ICE OR FIRE
-      </div>
-      <div class="rules-line text-grad-lr" style="margin-top: 14px;">
-        30 SECONDS TO COLLECT EMBERS
-      </div>
-      <div class="rules-line text-grad-lr" style="margin-top: 2px;">
-        AND CLAIM THE THRONE
-      </div>
-    </div>
-
-    <a href="./dashboard/" class="got-action-btn">TO DASHBOARD</a>
-  </div>
-
 </div>
 
 <!-- Navigation Dots -->
@@ -556,12 +530,11 @@
   <div class="dot" onclick="goToSlide(3)"></div>
   <div class="dot" onclick="goToSlide(4)"></div>
   <div class="dot" onclick="goToSlide(5)"></div>
-  <div class="dot" onclick="goToSlide(6)"></div>
 </div>
 
 <script>
   let currentSlide = 1;
-  const totalSlides = 6;
+  const totalSlides = 5;
   const topBackBtn = document.getElementById('top-back-btn');
 
   const goToSlide = (n) => {
