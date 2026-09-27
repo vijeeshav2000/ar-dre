@@ -556,15 +556,53 @@ function renderFx() {
 }
 renderFx()
 
-// Audio Controller: GoT Theme using HTML audio element
+// Audio Controller: GoT Theme — unlocks on first user interaction, plays for all outcomes
 class GotAudioController {
   constructor() {
     this.bgm = document.getElementById('got-audio')
     this.bgm.volume = 0.85
+    this.unlocked = false
+    this.playQueued = false
+
+    // Unlock audio on ANY early user interaction with the page
+    const unlock = () => {
+      if (this.unlocked) return
+      this.bgm.play().then(() => {
+        this.bgm.pause()
+        this.bgm.currentTime = 0
+        this.unlocked = true
+        // If playThroneMusic was called before unlock happened, play now
+        if (this.playQueued) {
+          this.playQueued = false
+          this.bgm.currentTime = 0
+          this.bgm.play().catch(() => {})
+        }
+      }).catch(() => {})
+    }
+
+    // Listen on every interaction type — keep listening (not once) in case first attempt fails
+    ;['click', 'touchstart', 'pointerdown', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, unlock, { passive: true })
+    })
   }
+
   playThroneMusic() {
-    this.bgm.currentTime = 0
-    this.bgm.play().catch(e => console.warn('GoT audio play blocked:', e))
+    if (this.unlocked) {
+      this.bgm.currentTime = 0
+      this.bgm.play().catch(e => console.warn('GoT audio blocked:', e))
+    } else {
+      // Audio not yet unlocked (WebSocket triggered before any click)
+      // Queue the play — it will fire the moment the presenter touches anything
+      this.playQueued = true
+      // Also try directly in case browser allows it
+      this.bgm.currentTime = 0
+      this.bgm.play().then(() => {
+        this.unlocked = true
+        this.playQueued = false
+      }).catch(() => {
+        console.warn('GoT audio: waiting for user interaction to unlock...')
+      })
+    }
   }
 }
 const audioController = new GotAudioController();
