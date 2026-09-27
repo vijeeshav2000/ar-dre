@@ -503,7 +503,7 @@
   <!-- SCREEN 4: GAME RULES / HOW TO PLAY -->
   <div class="slide" id="slide-4">
     <div class="rules-screen-container">
-      <img src="assets/RULES.png?v=6" alt="Game Rules: Two Players, 30 Seconds to Collect, Tap Screen to Collect" class="rules-screen-img" onclick="goToSlide(5)">
+      <img src="assets/RULES.png?v=7" alt="Game Rules: Two Players, 30 Seconds to Collect, Tap Screen to Collect" class="rules-screen-img" onclick="goToSlide(5)">
       <button class="rules-scan-btn" onclick="goToSlide(5)" aria-label="Scan QR Code"></button>
     </div>
   </div>
@@ -518,7 +518,7 @@
     <div class="side-flames-row">
       <img src="assets/ice_flame.png?v=12" alt="Ice Flame" class="flame-icon-left">
       <div class="qr-center-box">
-        <img src="assets/qr_code.png?v=15" alt="Scan QR Code to Play">
+        <img src="assets/qr_code.png?v=18" alt="Scan QR Code to Play">
       </div>
       <img src="assets/fire_flame.png?v=12" alt="Fire Flame" class="flame-icon-right">
     </div>
@@ -621,6 +621,12 @@
     }
   };
 
+  // Support ?slide=N in URL parameter (e.g. returning from dashboard for a new game)
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialSlide = parseInt(urlParams.get('slide'), 10);
+  if (initialSlide && initialSlide >= 1 && initialSlide <= totalSlides) {
+    window.goToSlide(initialSlide);
+  }
 </script>
 
 <script src="assets/fire-cursor.js?v=13"></script>

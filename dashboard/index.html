@@ -259,6 +259,70 @@
     text-transform: uppercase;
   }
 
+  /* Round Timer & Game Status Section */
+  .timer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .round-timer-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 24px;
+    border-radius: 20px;
+    background: rgba(6, 10, 16, 0.75);
+    border: 1px solid rgba(215, 185, 126, 0.35);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(215, 185, 126, 0.08);
+    backdrop-filter: blur(10px);
+  }
+  .timer-label {
+    font-family: 'Trajan', 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    color: #a09580;
+    text-transform: uppercase;
+  }
+  .timer-display {
+    font-family: 'Trajan', 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #d7b97e;
+    text-shadow: 0 0 12px rgba(215, 185, 126, 0.5);
+    min-width: 65px;
+  }
+  .timer-display.urgent {
+    color: #ff4520;
+    text-shadow: 0 0 18px rgba(255, 69, 32, 0.85);
+    animation: timerPulse 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes timerPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+  .game-status-text {
+    font-family: 'Trajan', 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: #8c96a0;
+    text-transform: uppercase;
+    text-align: center;
+    min-height: 18px;
+    transition: color 0.3s;
+  }
+  .game-status-text.active {
+    color: #7ec2eb;
+    text-shadow: 0 0 12px rgba(126, 194, 235, 0.5);
+  }
+  .game-status-text.urgent {
+    color: #e87834;
+    text-shadow: 0 0 12px rgba(232, 120, 52, 0.6);
+  }
+
   /* Claim Action Button */
   .throne-btn, .outcome-btn {
     display: inline-flex;
@@ -295,6 +359,15 @@
   }
   .throne-btn:active, .outcome-btn:active {
     transform: scale(0.97);
+  }
+
+  .throne-btn.pulse {
+    animation: claimPulse 0.8s ease-in-out infinite alternate;
+    box-shadow: 0 0 35px rgba(215, 185, 126, 0.7), 0 0 50px rgba(232, 120, 52, 0.5);
+  }
+  @keyframes claimPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
   }
 
   /* Fullscreen Outcome Viewport */
@@ -447,7 +520,7 @@
       </div>
       <div class="player-pill-badge ice">
         <div class="badge-title">PLAYER 1</div>
-        <div class="badge-sub">ICE</div>
+        <div class="badge-sub">ICE / ANTIMATTER</div>
       </div>
     </div>
 
@@ -460,9 +533,18 @@
       </div>
       <div class="player-pill-badge fire">
         <div class="badge-title">PLAYER 2</div>
-        <div class="badge-sub">FIRE</div>
+        <div class="badge-sub">FIRE / MATTER</div>
       </div>
     </div>
+  </div>
+
+  <!-- ROUND TIMER & GAME STATUS -->
+  <div class="timer-section" id="timer-section">
+    <div class="round-timer-box">
+      <span class="timer-label">ROUND TIME</span>
+      <span class="timer-display" id="round-timer">00:30</span>
+    </div>
+    <div class="game-status-text" id="game-status">WAITING FOR PLAYERS TO JOIN...</div>
   </div>
 
   <div id="suspense-banner">⚔️ SUMMONING THE IRON THRONE... ⚔️</div>
@@ -474,6 +556,7 @@
 <div id="outcome-screen">
   <div id="outcome-stage-1" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
     <h1 class="outcome-title" id="outcome-claim-title">ICE CLAIMS<br>THE THRONE</h1>
+    <div id="outcome-claim-sub" style="font-family: 'Trajan', 'Cinzel', serif; font-size: clamp(14px, 2.4vw, 20px); letter-spacing: 4px; color: #d7b97e; margin-bottom: 30px; text-transform: uppercase;">ANTIMATTER UNIVERSE PREVAILS</div>
     <button class="outcome-btn" id="outcome-see-more-btn">SEE MORE</button>
   </div>
 
@@ -623,12 +706,67 @@ const audioController = new GotAudioController();
   const outcomeStage1 = document.getElementById('outcome-stage-1')
   const outcomeStage2 = document.getElementById('outcome-stage-2')
   const outcomeClaimTitle = document.getElementById('outcome-claim-title')
+  const outcomeClaimSub = document.getElementById('outcome-claim-sub')
   const outcomeSeeMoreBtn = document.getElementById('outcome-see-more-btn')
   const outcomeStoryContent = document.getElementById('outcome-story-content')
+
+  const roundTimerEl = document.getElementById('round-timer')
+  const gameStatusEl = document.getElementById('game-status')
+  const timerSection = document.getElementById('timer-section')
 
   let currentIce = 0
   let currentFire = 0
   let currentWinner = 'ice'
+
+  // --- 30-Second Round Countdown Timer ---
+  const ROUND_DURATION = 30
+  let roundTimeRemaining = ROUND_DURATION
+  let roundTimerActive = false
+  let timerInterval = null
+
+  function startRoundTimer() {
+    if (roundTimerActive || winnerRevealed) return
+    roundTimerActive = true
+    if (gameStatusEl) {
+      gameStatusEl.textContent = 'ROUND ACTIVE \u00B7 GATHERING PARTICLES'
+      gameStatusEl.className = 'game-status-text active'
+    }
+
+    timerInterval = setInterval(() => {
+      roundTimeRemaining--
+      if (roundTimeRemaining >= 0 && roundTimerEl) {
+        const secs = String(roundTimeRemaining).padStart(2, '0')
+        roundTimerEl.textContent = `00:${secs}`
+        if (roundTimeRemaining <= 5 && roundTimeRemaining > 0) {
+          roundTimerEl.classList.add('urgent')
+          if (gameStatusEl) {
+            gameStatusEl.textContent = 'TIME EXPIRING \u00B7 GATHER PARTICLES'
+            gameStatusEl.className = 'game-status-text urgent'
+          }
+        }
+      }
+
+      if (roundTimeRemaining <= 0) {
+        clearInterval(timerInterval)
+        roundTimeRemaining = 0
+        if (roundTimerEl) {
+          roundTimerEl.textContent = '00:00'
+          roundTimerEl.classList.add('urgent')
+        }
+        if (gameStatusEl) {
+          gameStatusEl.textContent = 'TIME EXPIRED \u00B7 CLAIM THE THRONE'
+          gameStatusEl.className = 'game-status-text urgent'
+        }
+        if (throneBtn) throneBtn.classList.add('pulse')
+      }
+    }, 1000)
+  }
+
+  if (timerSection) {
+    timerSection.addEventListener('click', () => {
+      if (!roundTimerActive && !winnerRevealed) startRoundTimer()
+    })
+  }
 
   const formatDigits = (n) => String(n).padStart(2, '0')
 
@@ -663,7 +801,13 @@ const audioController = new GotAudioController();
     if (winnerRevealed) return
     winnerRevealed = true
 
-    throneBtn.style.display = 'none'
+    clearInterval(timerInterval)
+    roundTimerActive = false
+    if (roundTimerEl) roundTimerEl.textContent = '00:00'
+    if (throneBtn) {
+      throneBtn.classList.remove('pulse')
+      throneBtn.style.display = 'none'
+    }
     suspenseBanner.style.display = 'block'
     mainContainer.classList.add('screen-shake')
     setTimeout(() => { mainContainer.classList.remove('screen-shake') }, 800)
@@ -698,15 +842,18 @@ const audioController = new GotAudioController();
       if (currentWinner === 'ice') {
         outcomeScreen.style.backgroundImage = "url('assets/outcome_ice_dragon.jpg?v=11')"
         outcomeScreen.style.backgroundColor = 'transparent'
-        outcomeClaimTitle.innerHTML = 'ICE CLAIMS<br>THE THRONE'
+        outcomeClaimTitle.innerHTML = 'ICE PREVAILS<br>THE THRONE IS CLAIMED'
+        if (outcomeClaimSub) outcomeClaimSub.textContent = 'ANTIMATTER UNIVERSE SURVIVES'
       } else if (currentWinner === 'fire') {
         outcomeScreen.style.backgroundImage = "url('assets/outcome_fire_dragon.jpg?v=11')"
         outcomeScreen.style.backgroundColor = 'transparent'
-        outcomeClaimTitle.innerHTML = 'FIRE CLAIMS<br>THE THRONE'
+        outcomeClaimTitle.innerHTML = 'FIRE PREVAILS<br>THE THRONE IS CLAIMED'
+        if (outcomeClaimSub) outcomeClaimSub.textContent = 'MATTER UNIVERSE SURVIVES'
       } else {
         outcomeScreen.style.backgroundImage = 'none'
         outcomeScreen.style.backgroundColor = '#000000'
-        outcomeClaimTitle.innerHTML = 'ANNIHILATION'
+        outcomeClaimTitle.innerHTML = 'PERFECT ANNIHILATION'
+        if (outcomeClaimSub) outcomeClaimSub.textContent = 'TOTAL COSMIC CANCELLATION'
       }
 
       outcomeStage1.style.display = 'flex'
@@ -764,12 +911,16 @@ const audioController = new GotAudioController();
             let totalIce = 0
             let totalFire = 0
             let shouldReveal = false
+            const hasPlayers = Object.keys(scoresObj).length > 0
             Object.values(scoresObj).forEach(s => {
               totalIce += (s.ice || 0)
               totalFire += (s.fire || 0)
               if (s.reveal) shouldReveal = true
             })
             updateScores(totalIce, totalFire)
+            if ((hasPlayers || totalIce > 0 || totalFire > 0) && !roundTimerActive && !winnerRevealed) {
+              startRoundTimer()
+            }
             if (shouldReveal && !winnerRevealed) {
               setTimeout(() => revealWinner(), 800)
             }
@@ -807,12 +958,16 @@ const audioController = new GotAudioController();
         let totalIce = 0
         let totalFire = 0
         let shouldReveal = false
+        const hasPlayers = Object.keys(scoresObj).length > 0
         Object.values(scoresObj).forEach(s => {
           totalIce += (s.ice || 0)
           totalFire += (s.fire || 0)
           if (s.reveal) shouldReveal = true
         })
         updateScores(totalIce, totalFire)
+        if ((hasPlayers || totalIce > 0 || totalFire > 0) && !roundTimerActive && !winnerRevealed) {
+          startRoundTimer()
+        }
         if (shouldReveal && !winnerRevealed) {
           setTimeout(() => revealWinner(), 800)
         }
@@ -842,15 +997,15 @@ const audioController = new GotAudioController();
   initDashboard()
 })()
 
-// --- New Game: reset relay server then reload dashboard to first screen ---
+// --- New Game: reset relay server then return to exhibition screen (QR code display) ---
 async function startNewGame() {
   const WORKER_HOST = 'score-relay.iceandfire.workers.dev'
   const ROOM_ID = 'quantum1'
   try {
     await fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(ROOM_ID), { method: 'POST' })
   } catch(e) {}
-  // Reload dashboard fresh — auto-reset on load will keep it clean
-  window.location.href = window.location.pathname + '?v=' + Date.now()
+  // Go back to the exhibition screen at Slide 5 (QR code display) for the next round
+  window.location.href = '../?slide=5&v=' + Date.now()
 }
 
 
