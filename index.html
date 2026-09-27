@@ -163,12 +163,21 @@
     padding: 0 15px;
   }
 
-  /* Slide 2 lore text — must stay in the center gap between the two portraits */
+  /* Slide 2 lore text — compact, 5-line composition matching reference */
   #slide-2 .lore-text-block {
-    max-width: 480px;
-    padding: 0 12px;
+    width: clamp(380px, 42vw, 420px);
+    max-width: 420px;
+    padding: 0 8px;
     font-size: clamp(1.05rem, 1.9vw, 1.35rem);
-    line-height: 2.1;
+    line-height: 1.65;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 600px) {
+    #slide-2 .lore-line {
+      white-space: nowrap;
+    }
   }
 
   /* Slide 3 lore text & container layout — match reference image width and rhythm */
@@ -454,9 +463,10 @@
 
     <div class="lore-text-block">
       <span class="lore-line text-grad-lr">A SONG OF ICE AND FIRE. TWO</span>
-      <span class="lore-line text-grad-lr">FORCES, ANCIENT AND OPPOSED &mdash;</span>
+      <span class="lore-line text-grad-lr">FORCES, ANCIENT AND OPPOSED</span>
       <span class="lore-line text-grad-lr">ONE OF CREATION, ONE OF ENDING.</span>
-      <span class="lore-line text-grad-lr">WHERE THEY MEET, WORLDS ARE DECIDED.</span>
+      <span class="lore-line text-grad-lr">WHERE THEY MEET, WORLDS ARE</span>
+      <span class="lore-line text-grad-lr">DECIDED.</span>
     </div>
 
     <button class="got-action-btn" onclick="goToSlide(3)">CONTINUE</button>
