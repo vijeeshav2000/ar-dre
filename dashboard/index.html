@@ -796,7 +796,6 @@ const audioController = new GotAudioController();
       reconnectTimer = setTimeout(connectWS, 3000)
     }
   }
-  connectWS()
 
   // Fallback Polling — also detects reveal flag if WS is down
   async function pollState() {
@@ -820,8 +819,27 @@ const audioController = new GotAudioController();
       }
     } catch(e) {}
   }
-  setInterval(pollState, 1500)
-  pollState()
+
+  // Boot: check for stale game FIRST, reset if needed, THEN connect — no race condition
+  async function initDashboard() {
+    try {
+      const res = await fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID))
+      if (res.ok) {
+        const data = await res.json()
+        const scoresObj = data.scores || {}
+        const alreadyRevealed = Object.values(scoresObj).some(s => s.reveal)
+        if (alreadyRevealed) {
+          await fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(ROOM_ID), { method: 'POST' })
+          console.log('Previous game auto-reset. Starting fresh dashboard.')
+        }
+      }
+    } catch(e) {}
+    // Only AFTER reset confirmed: start WS + polling with clean state
+    connectWS()
+    setInterval(pollState, 1500)
+    pollState()
+  }
+  initDashboard()
 })()
 
 // --- New Game: reset relay server then reload dashboard fresh ---
@@ -835,24 +853,7 @@ async function startNewGame() {
   window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now()
 }
 
-// --- On page load: if previous game's reveal flag is still set, auto-reset so refresh gives clean slate ---
-;(async () => {
-  const WORKER_HOST = 'score-relay.iceandfire.workers.dev'
-  const ROOM_ID = 'quantum1'
-  try {
-    const res = await fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID))
-    if (res.ok) {
-      const data = await res.json()
-      const scoresObj = data.scores || {}
-      const alreadyRevealed = Object.values(scoresObj).some(s => s.reveal)
-      if (alreadyRevealed) {
-        // Previous game was ended — auto-reset before this session starts
-        await fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(ROOM_ID), { method: 'POST' })
-        console.log('Previous game auto-reset on dashboard load')
-      }
-    }
-  } catch(e) {}
-})()
+
 </script>
 
 <script src="assets/fire-cursor.js?v=11"></script>
