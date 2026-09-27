@@ -482,7 +482,7 @@
       <div class="lore-text-block" style="margin-bottom: 0;">
         <span class="lore-line text-grad-lr">THIS ISN'T ONLY A STORY. IN PHYSICS, EVERY</span>
         <span class="lore-line text-grad-lr">PARTICLE OF MATTER HAS A MIRROR</span>
-        <span class="lore-line text-grad-lr">OPPOSITE &mdash; ANTIMATTER. AND WHEN THEY</span>
+        <span class="lore-line text-grad-lr">OPPOSITE ANTIMATTER. AND WHEN THEY</span>
         <span class="lore-line text-grad-lr">MEET, LIKE ICE AND FIRE, NEITHER SURVIVES.</span>
         <span class="lore-line text-grad-lr">THE UNIVERSE SHOULD HAVE CANCELLED</span>
         <span class="lore-line text-grad-lr">ITSELF INTO NOTHING. IT DIDN'T.</span>
@@ -592,10 +592,10 @@
         playerStatusEl.textContent = 'WAITING FOR PLAYERS...';
         playerStatusEl.style.color = 'rgba(255,255,255,0.55)';
       } else if (count === 1) {
-        playerStatusEl.textContent = '1 PLAYER JOINED — WAITING FOR PLAYER 2...';
+        playerStatusEl.textContent = '1 PLAYER JOINED. WAITING FOR PLAYER 2...';
         playerStatusEl.style.color = 'rgba(126, 194, 235, 0.85)';
       } else if (count >= 2) {
-        playerStatusEl.textContent = '⚔️ BOTH PLAYERS READY — LAUNCHING DASHBOARD...';
+        playerStatusEl.textContent = '⚔️ BOTH PLAYERS READY. LAUNCHING DASHBOARD...';
         playerStatusEl.style.color = 'rgba(232, 120, 52, 1)';
         clearInterval(playerPollInterval);
         // Short delay so they can see the message, then auto-navigate
