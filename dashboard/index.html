@@ -355,6 +355,66 @@
     box-shadow: none;
   }
 
+  /* Sound Toggle Button */
+  .sound-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 500;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(8, 12, 20, 0.75);
+    border: 1px solid rgba(215, 185, 126, 0.4);
+    color: #d7b97e;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+  }
+  .sound-toggle-btn:hover {
+    transform: scale(1.1);
+    border-color: rgba(215, 185, 126, 0.9);
+    box-shadow: 0 0 20px rgba(215, 185, 126, 0.5);
+  }
+
+  /* Tap for Music Prompt Pill */
+  .music-prompt-pill {
+    margin-top: 22px;
+    background: rgba(10, 16, 26, 0.9);
+    border: 1px solid #d7b97e;
+    color: #ffffff;
+    font-family: 'Trajan', 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 12px 24px;
+    border-radius: 24px;
+    cursor: pointer;
+    z-index: 250;
+    box-shadow: 0 0 25px rgba(215, 185, 126, 0.6);
+    transition: all 0.3s;
+    animation: pulseMusic 2s infinite alternate;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+  }
+  .music-prompt-pill:hover {
+    transform: scale(1.05);
+    background: rgba(20, 30, 48, 0.95);
+    color: #d7b97e;
+  }
+  @keyframes pulseMusic {
+    from { box-shadow: 0 0 15px rgba(215, 185, 126, 0.3); }
+    to { box-shadow: 0 0 30px rgba(215, 185, 126, 0.85); }
+  }
+
   /* Suspense Banner */
   #suspense-banner {
     display: none;
@@ -469,16 +529,26 @@
   <button class="throne-btn" id="throne-btn">CLAIM</button>
 </div>
 
+<!-- GoT Theme Audio -->
+<audio id="got-bgm" preload="auto" loop playsinline src="assets/got-theme.mp3"></audio>
+
+<!-- Floating Sound Mute/Unmute Toggle -->
+<button id="sound-toggle-btn" class="sound-toggle-btn" title="Toggle Sound">
+  <span id="sound-icon">🔊</span>
+</button>
+
 <!-- Fullscreen Outcome Screen Container -->
 <div id="outcome-screen">
   <div id="outcome-stage-1" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
     <h1 class="outcome-title" id="outcome-claim-title">ICE CLAIMS<br>THE THRONE</h1>
     <button class="outcome-btn" id="outcome-see-more-btn">SEE MORE</button>
+    <button id="music-prompt-btn-1" class="music-prompt-pill">🎵 TAP FOR THEME MUSIC 🔊</button>
   </div>
 
   <div id="outcome-stage-2" style="display: none; flex-direction: column; align-items: center; justify-content: center;">
     <p class="outcome-story-text" id="outcome-story-content"></p>
     <a href="../" class="outcome-btn">HOME</a>
+    <button id="music-prompt-btn-2" class="music-prompt-pill">🎵 TAP FOR THEME MUSIC 🔊</button>
   </div>
 </div>
 
@@ -556,50 +626,83 @@ function renderFx() {
 renderFx()
 
 // Audio Controller: Pure GoT Theme Song playback
-class GotAudioController {
-  constructor() {
-    this.bgm = new Audio('assets/got-theme.mp3')
-    this.bgm.volume = 0.85
-    this.bgm.loop = true
-    this.bgm.preload = 'auto'
-    this.isPlaying = false
+let shouldPlayMusic = false
+let isMuted = false
+const bgm = document.getElementById('got-bgm')
+const soundToggleBtn = document.getElementById('sound-toggle-btn')
+const soundIcon = document.getElementById('sound-icon')
+const musicPromptBtns = [document.getElementById('music-prompt-btn-1'), document.getElementById('music-prompt-btn-2')]
 
-    const unlock = () => {
-      this.bgm.load()
-    }
-    window.addEventListener('click', unlock, { once: true })
-    window.addEventListener('touchstart', unlock, { once: true })
+function updateSoundUI() {
+  if (soundIcon) {
+    soundIcon.textContent = (bgm && !bgm.paused && !isMuted) ? '🔊' : '🔇'
   }
+  const showPrompt = shouldPlayMusic && bgm && bgm.paused && !isMuted
+  musicPromptBtns.forEach(btn => {
+    if (btn) btn.style.display = showPrompt ? 'inline-flex' : 'none'
+  })
+}
 
-  playThroneMusic() {
-    if (this.isPlaying) return
-    try {
-      this.bgm.currentTime = 0
-      const promise = this.bgm.play()
-      if (promise !== undefined) {
-        promise
-          .then(() => {
-            this.isPlaying = true
-          })
-          .catch(e => {
-            console.log('Autoplay deferred until user interaction:', e)
-            const playOnGesture = () => {
-              this.bgm.play().then(() => {
-                this.isPlaying = true
-              }).catch(() => {})
-              window.removeEventListener('click', playOnGesture)
-              window.removeEventListener('touchstart', playOnGesture)
-            }
-            window.addEventListener('click', playOnGesture)
-            window.addEventListener('touchstart', playOnGesture)
-          })
-      }
-    } catch(e) {
-      console.log('Audio playback error:', e)
-    }
+function playThroneMusic() {
+  shouldPlayMusic = true
+  if (!bgm || isMuted) return
+  bgm.volume = 1.0
+  bgm.loop = true
+  const promise = bgm.play()
+  if (promise !== undefined) {
+    promise
+      .then(() => {
+        console.log('GoT theme playing!')
+        updateSoundUI()
+      })
+      .catch(err => {
+        console.warn('Autoplay prevented by browser:', err)
+        updateSoundUI()
+      })
   }
 }
-const audioController = new GotAudioController();
+
+function toggleSound() {
+  if (!bgm) return
+  if (bgm.paused) {
+    isMuted = false
+    shouldPlayMusic = true
+    bgm.play().then(() => updateSoundUI()).catch(e => console.warn(e))
+  } else {
+    isMuted = true
+    bgm.pause()
+    updateSoundUI()
+  }
+}
+
+if (soundToggleBtn) {
+  soundToggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    toggleSound()
+  })
+}
+
+musicPromptBtns.forEach(btn => {
+  if (btn) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      isMuted = false
+      playThroneMusic()
+    })
+  }
+})
+
+// Any click / tap on screen plays audio if throne was claimed
+const triggerAudioOnGesture = () => {
+  if (shouldPlayMusic && bgm && bgm.paused && !isMuted) {
+    bgm.play().then(() => updateSoundUI()).catch(() => {})
+  }
+}
+window.addEventListener('pointerdown', triggerAudioOnGesture)
+window.addEventListener('click', triggerAudioOnGesture)
+window.addEventListener('touchstart', triggerAudioOnGesture)
+window.addEventListener('keydown', triggerAudioOnGesture)
+
 
 // --- Realm Dashboard Logic ---
 (() => {
@@ -662,7 +765,7 @@ const audioController = new GotAudioController();
     mainContainer.classList.add('screen-shake')
     setTimeout(() => { mainContainer.classList.remove('screen-shake') }, 800)
 
-    audioController.playThroneMusic()
+    playThroneMusic()
 
     if (winnerOverride) {
       currentWinner = winnerOverride
@@ -710,7 +813,7 @@ const audioController = new GotAudioController();
   }
 
   outcomeSeeMoreBtn.addEventListener('click', () => {
-    audioController.playThroneMusic()
+    playThroneMusic()
     outcomeStage1.style.display = 'none'
     outcomeStage2.style.display = 'flex'
 
@@ -730,6 +833,7 @@ const audioController = new GotAudioController();
   })
 
   throneBtn.addEventListener('click', () => {
+    playThroneMusic()
     revealWinner()
   })
 
@@ -811,10 +915,17 @@ const audioController = new GotAudioController();
           setTimeout(() => revealWinner(), 800)
         }
       }
-    } catch(e) {}
-  }
   setInterval(pollState, 1500)
   pollState()
+
+  // Direct reveal from URL parameter (e.g. redirected from mobile AR)
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.get('reveal') === '1' || urlParams.get('claim') === '1') {
+    const winnerParam = urlParams.get('winner')
+    setTimeout(() => {
+      revealWinner(winnerParam)
+    }, 400)
+  }
 })()
 </script>
 
