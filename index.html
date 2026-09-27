@@ -626,11 +626,20 @@
 
   async function checkPlayers() {
     try {
-      const res = await fetch(`https://score-relay.iceandfire.workers.dev/state?room=${encodeURIComponent(currentRoom)}`);
-      if (!res.ok) return;
-      const data = await res.json();
-      const scores = data.scores || {};
-      const count = Object.keys(scores).length;
+      let combinedPlayers = {};
+      const res1 = await fetch(`https://score-relay.iceandfire.workers.dev/state?room=${encodeURIComponent(currentRoom)}`);
+      if (res1.ok) {
+        const data1 = await res1.json();
+        Object.assign(combinedPlayers, data1.scores || {});
+      }
+      if (currentRoom !== 'quantum1') {
+        const res2 = await fetch(`https://score-relay.iceandfire.workers.dev/state?room=quantum1`);
+        if (res2.ok) {
+          const data2 = await res2.json();
+          Object.assign(combinedPlayers, data2.scores || {});
+        }
+      }
+      const count = Object.keys(combinedPlayers).length;
 
       if (count === 0) {
         playerStatusEl.textContent = 'WAITING FOR PLAYERS...';

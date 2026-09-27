@@ -887,46 +887,76 @@ const audioController = new GotAudioController();
     revealWinner()
   })
 
-  // --- WebSocket Live Connection ---
+  // --- WebSocket Live Connection & Multi-Room State Sync ---
   const WORKER_HOST = 'score-relay.iceandfire.workers.dev'
   const _dashParams = new URLSearchParams(window.location.search)
   const ROOM_ID = _dashParams.get('room') || sessionStorage.getItem('current_room') || 'quantum1'
-  let ws = null
-  let reconnectTimer = null
+  let wsPrimary = null
+  let wsDefault = null
+  let reconnectTimer1 = null
+  let reconnectTimer2 = null
 
-  function connectWS() {
+  // Master score dictionary: { Ice: { ice: 0, fire: 0, reveal: false }, Fire: { ice: 0, fire: 0, reveal: false } }
+  const masterScores = {}
+
+  function processStateMessage(scoresObj) {
+    if (!scoresObj || typeof scoresObj !== 'object') return
+    let updated = false
+    Object.entries(scoresObj).forEach(([team, s]) => {
+      if (!s) return
+      const normTeam = (team || '').trim().toLowerCase() === 'ice' ? 'Ice' : 'Fire'
+      if (!masterScores[normTeam]) {
+        masterScores[normTeam] = { ice: 0, fire: 0, reveal: false }
+      }
+      const newIce = Math.max(masterScores[normTeam].ice, Number(s.ice) || 0)
+      const newFire = Math.max(masterScores[normTeam].fire, Number(s.fire) || 0)
+      const newReveal = masterScores[normTeam].reveal || Boolean(s.reveal)
+      if (newIce !== masterScores[normTeam].ice || newFire !== masterScores[normTeam].fire || newReveal !== masterScores[normTeam].reveal) {
+        masterScores[normTeam].ice = newIce
+        masterScores[normTeam].fire = newFire
+        masterScores[normTeam].reveal = newReveal
+        updated = true
+      }
+    })
+
+    let totalIce = 0
+    let totalFire = 0
+    let shouldReveal = false
+    const hasPlayers = Object.keys(masterScores).length > 0
+    Object.values(masterScores).forEach(s => {
+      totalIce += s.ice
+      totalFire += s.fire
+      if (s.reveal) shouldReveal = true
+    })
+
+    updateScores(totalIce, totalFire)
+
+    if ((hasPlayers || totalIce > 0 || totalFire > 0) && !roundTimerActive && !winnerRevealed) {
+      startRoundTimer()
+    }
+    if (shouldReveal && !winnerRevealed) {
+      setTimeout(() => revealWinner(), 800)
+    }
+  }
+
+  function connectSocket(roomName, isPrimary) {
     try {
-      ws = new WebSocket('wss://' + WORKER_HOST + '/ws?room=' + encodeURIComponent(ROOM_ID) + '&name=dashboard&role=viewer')
+      const socket = new WebSocket('wss://' + WORKER_HOST + '/ws?room=' + encodeURIComponent(roomName) + '&name=dashboard&role=viewer')
 
-      ws.onopen = () => {
+      socket.onopen = () => {
         statusEl.textContent = 'REALM LIVE \u00B7 TRACKING SCORES'
         statusEl.classList.add('connected')
-        if (reconnectTimer) clearTimeout(reconnectTimer)
+        if (isPrimary && reconnectTimer1) clearTimeout(reconnectTimer1)
+        if (!isPrimary && reconnectTimer2) clearTimeout(reconnectTimer2)
       }
 
-      ws.onmessage = (event) => {
+      socket.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data)
           if (msg.type === 'state') {
             const scoresObj = msg.scores || (msg.data && msg.data.scores) || {}
-            let totalIce = 0
-            let totalFire = 0
-            let shouldReveal = false
-            const hasPlayers = Object.keys(scoresObj).length > 0
-            Object.values(scoresObj).forEach(s => {
-              totalIce += (s.ice || 0)
-              totalFire += (s.fire || 0)
-              if (s.reveal) shouldReveal = true
-            })
-            updateScores(totalIce, totalFire)
-            if ((hasPlayers || totalIce > 0 || totalFire > 0) && !roundTimerActive && !winnerRevealed) {
-              startRoundTimer()
-            }
-            if (shouldReveal && !winnerRevealed) {
-              setTimeout(() => revealWinner(), 800)
-            }
+            processStateMessage(scoresObj)
           } else if (msg.type === 'universe') {
-            // Direct universe broadcast from worker
             if (!winnerRevealed) {
               const w = msg.winner || (msg.totalIce > msg.totalFire ? 'ice' : msg.totalFire > msg.totalIce ? 'fire' : 'tie')
               setTimeout(() => revealWinner(w), 800)
@@ -935,64 +965,81 @@ const audioController = new GotAudioController();
         } catch(e) {}
       }
 
-      ws.onclose = () => {
-        statusEl.textContent = 'RECONNECTING TO REALM RELAY...'
-        statusEl.classList.remove('connected')
-        reconnectTimer = setTimeout(connectWS, 3000)
+      socket.onclose = () => {
+        if ((!wsPrimary || wsPrimary.readyState !== WebSocket.OPEN) && 
+            (!wsDefault || wsDefault.readyState !== WebSocket.OPEN)) {
+          statusEl.textContent = 'RECONNECTING TO REALM RELAY...'
+          statusEl.classList.remove('connected')
+        }
+        if (isPrimary) {
+          reconnectTimer1 = setTimeout(() => { wsPrimary = connectSocket(ROOM_ID, true) }, 2500)
+        } else {
+          reconnectTimer2 = setTimeout(() => { wsDefault = connectSocket('quantum1', false) }, 2500)
+        }
       }
 
-      ws.onerror = () => {
-        try { ws.close() } catch(e) {}
+      socket.onerror = () => {
+        try { socket.close() } catch(e) {}
       }
+
+      return socket
     } catch(e) {
-      reconnectTimer = setTimeout(connectWS, 3000)
+      if (isPrimary) {
+        reconnectTimer1 = setTimeout(() => { wsPrimary = connectSocket(ROOM_ID, true) }, 2500)
+      } else {
+        reconnectTimer2 = setTimeout(() => { wsDefault = connectSocket('quantum1', false) }, 2500)
+      }
+      return null
     }
   }
 
-  // Fallback Polling — also detects reveal flag if WS is down
+  function connectAllWS() {
+    wsPrimary = connectSocket(ROOM_ID, true)
+    if (ROOM_ID !== 'quantum1') {
+      wsDefault = connectSocket('quantum1', false)
+    }
+  }
+
+  // Fast Fallback Polling (every 500ms) for real-time responsiveness even if WebSockets are blocked
   async function pollState() {
     try {
-      const res = await fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID))
-      if (res.ok) {
-        const data = await res.json()
-        const scoresObj = data.scores || (data.data && data.data.scores) || {}
-        let totalIce = 0
-        let totalFire = 0
-        let shouldReveal = false
-        const hasPlayers = Object.keys(scoresObj).length > 0
-        Object.values(scoresObj).forEach(s => {
-          totalIce += (s.ice || 0)
-          totalFire += (s.fire || 0)
-          if (s.reveal) shouldReveal = true
-        })
-        updateScores(totalIce, totalFire)
-        if ((hasPlayers || totalIce > 0 || totalFire > 0) && !roundTimerActive && !winnerRevealed) {
-          startRoundTimer()
-        }
-        if (shouldReveal && !winnerRevealed) {
-          setTimeout(() => revealWinner(), 800)
-        }
-      }
+      const p1 = fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID))
+        .then(r => r.ok ? r.json() : null)
+        .catch(() => null)
+      const p2 = (ROOM_ID !== 'quantum1')
+        ? fetch('https://' + WORKER_HOST + '/state?room=quantum1')
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null)
+
+      const [res1, res2] = await Promise.all([p1, p2])
+      if (res1 && res1.scores) processStateMessage(res1.scores)
+      if (res2 && res2.scores) processStateMessage(res2.scores)
     } catch(e) {}
   }
 
-  // Boot: check for stale game FIRST, reset if needed, THEN connect — no race condition
+  // Boot: check for stale game FIRST, reset if needed, THEN connect
   async function initDashboard() {
     try {
-      const res = await fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID))
-      if (res.ok) {
-        const data = await res.json()
-        const scoresObj = data.scores || {}
-        const alreadyRevealed = Object.values(scoresObj).some(s => s.reveal)
-        if (alreadyRevealed) {
-          await fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(ROOM_ID), { method: 'POST' })
-          console.log('Previous game auto-reset. Starting fresh dashboard.')
-        }
+      const [res1, res2] = await Promise.all([
+        fetch('https://' + WORKER_HOST + '/state?room=' + encodeURIComponent(ROOM_ID)).then(r => r.ok ? r.json() : null).catch(() => null),
+        (ROOM_ID !== 'quantum1') ? fetch('https://' + WORKER_HOST + '/state?room=quantum1').then(r => r.ok ? r.json() : null).catch(() => null) : Promise.resolve(null)
+      ])
+      const s1 = (res1 && res1.scores) || {}
+      const s2 = (res2 && res2.scores) || {}
+      const alreadyRevealed1 = Object.values(s1).some(s => s.reveal)
+      const alreadyRevealed2 = Object.values(s2).some(s => s.reveal)
+      if (alreadyRevealed1 || alreadyRevealed2) {
+        await Promise.all([
+          fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(ROOM_ID), { method: 'POST' }).catch(() => {}),
+          (ROOM_ID !== 'quantum1') ? fetch('https://' + WORKER_HOST + '/reset?room=quantum1', { method: 'POST' }).catch(() => {}) : Promise.resolve()
+        ])
+        console.log('Previous game auto-reset. Starting fresh dashboard.')
       }
     } catch(e) {}
-    // Only AFTER reset confirmed: start WS + polling with clean state
-    connectWS()
-    setInterval(pollState, 1500)
+
+    connectAllWS()
+    setInterval(pollState, 500)
     pollState()
   }
   initDashboard()
