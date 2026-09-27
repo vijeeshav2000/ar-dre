@@ -842,15 +842,15 @@ const audioController = new GotAudioController();
   initDashboard()
 })()
 
-// --- New Game: reset relay server then reload dashboard fresh ---
+// --- New Game: reset relay server then go to home page ---
 async function startNewGame() {
   const WORKER_HOST = 'score-relay.iceandfire.workers.dev'
   const ROOM_ID = 'quantum1'
   try {
     await fetch('https://' + WORKER_HOST + '/reset?room=' + encodeURIComponent(ROOM_ID), { method: 'POST' })
   } catch(e) {}
-  // Hard reload — bypasses cache, starts completely fresh
-  window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now()
+  // Navigate to home page
+  window.location.href = '../'
 }
 
 
